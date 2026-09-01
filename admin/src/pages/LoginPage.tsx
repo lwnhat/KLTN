@@ -57,11 +57,8 @@ export default function LoginPage() {
     }
   };
 
-  const fillCredentials = (email: string, role: string) => {
-    form.setFieldsValue({ email, password: 'Admin@123456' });
-  };
-
   return (
+
     <div
       style={{
         minHeight: '100vh',
@@ -142,7 +139,6 @@ export default function LoginPage() {
           form={form}
           layout="vertical"
           onFinish={handleLogin}
-          initialValues={{ email: 'admin@jewelry.com', password: 'Admin@123456' }}
         >
           <Form.Item
             label={<span style={{ fontWeight: 600, color: '#334155' }}>Email Quản Trị</span>}
@@ -154,7 +150,7 @@ export default function LoginPage() {
           >
             <Input
               prefix={<UserOutlined style={{ color: '#94a3b8' }} />}
-              placeholder="admin@jewelry.com"
+              placeholder="admin@example.com"
               size="large"
               style={{ borderRadius: 10 }}
             />
@@ -173,7 +169,7 @@ export default function LoginPage() {
             />
           </Form.Item>
 
-          <Form.Item style={{ marginTop: 24 }}>
+          <Form.Item style={{ marginTop: 24, marginBottom: 0 }}>
             <Button
               type="primary"
               htmlType="submit"
@@ -193,47 +189,10 @@ export default function LoginPage() {
               <SafetyCertificateFilled /> ĐĂNG NHẬP DASHBOARD <ArrowRightOutlined />
             </Button>
           </Form.Item>
-
-          {/* Quick Account Fill Section */}
-          <div
-            style={{
-              background: '#f8fafc',
-              padding: '14px 16px',
-              borderRadius: 12,
-              border: '1px solid #e2e8f0',
-              fontSize: 12,
-            }}
-          >
-            <div style={{ fontWeight: 700, color: '#475569', marginBottom: 8 }}>
-              Chọn tài khoản đăng nhập nhanh:
-            </div>
-            <Space wrap size={[6, 6]}>
-              <Tag
-                color="gold"
-                style={{ cursor: 'pointer', padding: '4px 10px', borderRadius: 6, fontWeight: 600 }}
-                onClick={() => fillCredentials('admin@jewelry.com', 'Admin')}
-              >
-                👑 Super Admin
-              </Tag>
-              <Tag
-                color="blue"
-                style={{ cursor: 'pointer', padding: '4px 10px', borderRadius: 6, fontWeight: 600 }}
-                onClick={() => fillCredentials('manager@jewelry.com', 'Manager')}
-              >
-                💼 Store Manager
-              </Tag>
-              <Tag
-                color="cyan"
-                style={{ cursor: 'pointer', padding: '4px 10px', borderRadius: 6, fontWeight: 600 }}
-                onClick={() => fillCredentials('staff@jewelry.com', 'Staff')}
-              >
-                🏷️ Store Staff
-              </Tag>
-            </Space>
-          </div>
         </Form>
       </Card>
     </div>
   );
 }
+
 

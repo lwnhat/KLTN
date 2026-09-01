@@ -263,17 +263,9 @@ export default function AccountPage() {
                   </span>
                 )}
               </button>
-
-              {/* Test account hint */}
-              <div className="bg-soft-cloud border border-hairline-soft p-3 rounded-lg text-xs text-mute space-y-1">
-                <p className="font-semibold text-ink">Tài khoản mẫu để thử nghiệm:</p>
-                <p>
-                  👤 Customer: <code className="font-mono bg-white px-1">customer@test.com</code> /{' '}
-                  <code className="font-mono bg-white px-1">User@123456</code>
-                </p>
-              </div>
             </form>
           )}
+
 
           {/* REGISTER FORM */}
           {tab === 'register' && (
