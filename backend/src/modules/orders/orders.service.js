@@ -45,7 +45,12 @@ async function createOrder(orderData) {
     notes,
   } = orderData;
 
+  if (!items || !Array.isArray(items) || items.length === 0) {
+    throw ApiError.badRequest('EMPTY_CART', 'Đơn hàng phải chứa ít nhất 1 sản phẩm.');
+  }
+
   // ─── PRE-TRANSACTION: Kiểm tra idempotency key ───────────────────────────
+
   // Dùng Redis để kiểm tra nhanh trước khi vào DB Transaction
   const redisIdempotencyKey = `order:idempotency:${idempotencyKey}`;
   const existingOrderId = await redis.get(redisIdempotencyKey);
