@@ -20,6 +20,19 @@ export default function ProductMasterVariantPage() {
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState<string | undefined>(undefined);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 12, total: 0 });
+  const [categories, setCategories] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch(`${API}/categories`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setCategories(data.data || []);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
 
   // Product Modal State
   const [modalOpen, setModalOpen] = useState(false);
@@ -71,6 +84,7 @@ export default function ProductMasterVariantPage() {
     setEditingProduct(record);
     form.setFieldsValue({
       name: record.name,
+      categoryId: record.category_id,
       material: record.material,
       basePrice: record.base_price,
       shortDescription: record.short_description,
@@ -344,12 +358,10 @@ export default function ProductMasterVariantPage() {
               allowClear
               style={{ width: 220 }}
               onChange={setFilterCategory}
-              options={[
-                { value: 'nhan', label: '💍 Nhẫn kim cương / Cưới' },
-                { value: 'day-chuyen', label: '✨ Dây chuyền vàng' },
-                { value: 'bong-tai', label: '🪩 Bông tai ngọc trai' },
-                { value: 'vong-tay', label: '💫 Vòng tay & Lắc vàng' },
-              ]}
+              options={categories.map(c => ({
+                value: c.slug,
+                label: `${c.name} (${c.slug})`,
+              }))}
             />
           </Space>
 
@@ -391,6 +403,21 @@ export default function ProductMasterVariantPage() {
 
           <Row gutter={12}>
             <Col span={12}>
+              <Form.Item
+                label="Danh mục trang sức"
+                name="categoryId"
+                rules={[{ required: true, message: 'Vui lòng chọn danh mục trang sức' }]}
+              >
+                <Select
+                  placeholder="-- Chọn danh mục --"
+                  options={categories.map(c => ({
+                    value: c.id,
+                    label: `${c.name} (${c.slug})`,
+                  }))}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
               <Form.Item label="Chất liệu" name="material" initialValue="Vàng 18K" rules={[{ required: true }]}>
                 <Select options={[
                   { value: 'Vàng 18K', label: 'Vàng 18K (750)' },
@@ -401,19 +428,22 @@ export default function ProductMasterVariantPage() {
                 ]} />
               </Form.Item>
             </Col>
+          </Row>
+
+          <Row gutter={12}>
             <Col span={12}>
               <Form.Item label="Giá cơ bản (VND)" name="basePrice" rules={[{ required: true, message: 'Nhập giá' }]}>
                 <InputNumber min={0} style={{ width: '100%' }} placeholder="35000000" formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} />
               </Form.Item>
             </Col>
-          </Row>
-
-          <Row gutter={12}>
             <Col span={12}>
               <Form.Item label="Thương hiệu" name="brand" initialValue="KLTN Fine Jewelry">
                 <Input />
               </Form.Item>
             </Col>
+          </Row>
+
+          <Row gutter={12}>
             <Col span={12}>
               <Form.Item label="Trạng thái" name="status" initialValue="active">
                 <Select options={[
@@ -423,14 +453,15 @@ export default function ProductMasterVariantPage() {
                 ]} />
               </Form.Item>
             </Col>
+            <Col span={12}>
+              <Form.Item label="Sản phẩm nổi bật (Trang chủ)" name="isFeatured" valuePropName="checked">
+                <Switch style={{ marginTop: 6 }} />
+              </Form.Item>
+            </Col>
           </Row>
 
           <Form.Item label="Mô tả ngắn" name="shortDescription">
             <Input.TextArea rows={2} placeholder="Vàng 18K đính Kim Cương GIA, miễn phí khắc chữ laser..." />
-          </Form.Item>
-
-          <Form.Item label="Sản phẩm nổi bật (Trang chủ)" name="isFeatured" valuePropName="checked">
-            <Switch />
           </Form.Item>
 
           {!editingProduct && (
