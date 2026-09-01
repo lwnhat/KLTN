@@ -94,13 +94,13 @@ const authLimiter = rateLimit({
 
 app.use(globalLimiter);
 
-// ─── Swagger API Documentation (CHỈ bật trên môi trường Non-Production) ───────
-if (process.env.NODE_ENV !== 'production') {
+// ─── Swagger API Documentation ──────────────────────────────────────────────
+if (process.env.DISABLE_SWAGGER !== 'true') {
   const swaggerUi = require('swagger-ui-express');
   const { swaggerSpec } = require('./config/swagger');
 
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-    customSiteTitle: '💎 KLTN Fine Jewelry API Docs',
+    customSiteTitle: '💎 Daniel Wellington Fine Jewelry API Docs',
     customCss: `
       .swagger-ui .topbar { background-color: #1a1a1a; padding: 10px 0; }
       .swagger-ui .topbar-wrapper img { content: url('https://img.icons8.com/color/48/diamond--v1.png'); width: 32px; height: 32px; }
@@ -116,8 +116,9 @@ if (process.env.NODE_ENV !== 'production') {
     res.send(swaggerSpec);
   });
 
-  logger.info('📚 Swagger UI available at /api-docs (development only)');
+  logger.info('📚 Swagger UI available at /api-docs');
 }
+
 
 // Webhook routes TRƯỚC express.json() để đọc raw body cho HMAC verification
 app.use('/api/v1/webhooks', webhookRoutes);
