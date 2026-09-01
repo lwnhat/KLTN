@@ -1,39 +1,47 @@
 /**
- * EMAIL SERVICE — Resend HTTP API
+ * EMAIL SERVICE — Mailjet HTTP API
  *
- * Render.com chặn tất cả outbound SMTP (port 25, 465, 587).
- * Giải pháp: Dùng Resend API giao tiếp qua HTTPS port 443 — không bao giờ bị chặn.
- * Free tier: 3,000 email/tháng, 100 email/ngày.
- * Docs: https://resend.com/docs
+ * Render.com chặn SMTP của Gmail & Brevo có IP restriction.
+ * Mailjet: HTTP API port 443, free 200 email/ngày, KHÔNG có IP restriction.
+ * Docs: https://dev.mailjet.com/email/guides/send-api-v31/
  */
-const { Resend } = require('resend');
+const Mailjet = require('node-mailjet');
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY || null;
-
-function getResend() {
-  if (!RESEND_API_KEY) {
-    throw new Error('[Email] RESEND_API_KEY chưa được cấu hình trong biến môi trường!');
-  }
-  return new Resend(RESEND_API_KEY);
-}
+const MJ_API_KEY    = process.env.MJ_API_KEY    || null;
+const MJ_API_SECRET = process.env.MJ_API_SECRET || null;
+const FROM_EMAIL = 'lengocminhnhat3@gmail.com';
+const FROM_NAME  = 'Daniel Wellington';
 
 async function sendMailWithResend({ from, to, subject, html }) {
-  const resend = getResend();
-  const { data, error } = await resend.emails.send({
-    from: from || 'Daniel Wellington <onboarding@resend.dev>',
-    to: Array.isArray(to) ? to : [to],
-    subject,
-    html,
-  });
-  if (error) {
-    console.error('[Resend Error]:', error);
-    throw new Error(error.message || 'Resend API error');
+  if (!MJ_API_KEY || !MJ_API_SECRET) {
+    throw new Error('[Email] MJ_API_KEY / MJ_API_SECRET chưa được cấu hình!');
   }
-  console.log(`📧 [Resend Sent] To: ${to} | ID: ${data?.id}`);
-  return { messageId: data?.id };
+
+  // Parse "Name <email>" or plain email
+  let toEmail = to;
+  let toName  = '';
+  if (typeof to === 'string') {
+    const m = to.match(/^(.+)\s<(.+)>$/);
+    if (m) { toName = m[1]; toEmail = m[2]; }
+  }
+
+  const client = Mailjet.apiConnect(MJ_API_KEY, MJ_API_SECRET);
+  const response = await client.post('send', { version: 'v3.1' }).request({
+    Messages: [{
+      From:     { Email: FROM_EMAIL, Name: FROM_NAME },
+      To:       [{ Email: toEmail, Name: toName || toEmail }],
+      Subject:  subject,
+      HTMLPart: html,
+    }],
+  });
+
+  const msgId = response.body?.Messages?.[0]?.To?.[0]?.MessageID || 'mailjet-ok';
+  console.log(`📧 [Mailjet Sent] To: ${toEmail} | MessageID: ${msgId}`);
+  return { messageId: String(msgId) };
 }
 
-const FROM = 'Daniel Wellington <onboarding@resend.dev>';
+const FROM = `${FROM_NAME} <${FROM_EMAIL}>`;
+
 
 /**
 
