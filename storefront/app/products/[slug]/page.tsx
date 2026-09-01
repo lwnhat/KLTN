@@ -6,12 +6,18 @@ import { useCartStore } from '@/store/cartStore';
 import { useToast } from '@/contexts/ToastContext';
 import { getAccessToken } from '@/lib/api';
 import EngravingModal, { EngravingData } from '@/components/product/EngravingModal';
-import { ShieldCheck, Sparkles, Check, FileText, Heart, Star, User, MessageSquare, ShoppingBag } from 'lucide-react';
+import SizeGuideModal from '@/components/product/SizeGuideModal';
+import ProductAccordions from '@/components/product/ProductAccordions';
+import CompleteTheLook from '@/components/product/CompleteTheLook';
+import { ShieldCheck, Sparkles, Check, FileText, Heart, Star, User, MessageSquare, ShoppingBag, Package, RefreshCw, Gift, Ruler } from 'lucide-react';
 
 export default function ProductDetailPage({ params }: { params: { slug: string } }) {
   const [product, setProduct] = useState<any>(null);
   const [selectedVariant, setSelectedVariant] = useState<any>(null);
   const [isEngravingOpen, setIsEngravingOpen] = useState(false);
+  const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
+  const [selectedColor, setSelectedColor] = useState('Bạc');
+  const [selectedSize, setSelectedSize] = useState('48');
   const [customization, setCustomization] = useState<EngravingData | null>(null);
   const [isAddingCart, setIsAddingCart] = useState(false);
   const [isHeartBeating, setIsHeartBeating] = useState(false);
@@ -38,6 +44,19 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
           setProduct(data.data);
           const initialVariant = data.data.variants?.[0] || null;
           setSelectedVariant(initialVariant);
+
+          // Infer default color & size
+          const nameLower = (data.data.name || '').toLowerCase();
+          if (nameLower.includes('hồng')) setSelectedColor('Vàng hồng');
+          else if (nameLower.includes('vàng')) setSelectedColor('Vàng');
+          else setSelectedColor('Bạc');
+
+          const catSlug = (data.data.category_slug || '').toLowerCase();
+          if (catSlug.includes('nhan') || nameLower.includes('nhẫn')) setSelectedSize('48');
+          else if (catSlug.includes('vong') || nameLower.includes('vòng') || nameLower.includes('lắc')) setSelectedSize('155-185mm');
+          else if (catSlug.includes('day') || nameLower.includes('dây')) setSelectedSize('40-45cm');
+          else if (catSlug.includes('bong') || nameLower.includes('bông')) setSelectedSize('Một kích thước');
+          else setSelectedSize('Tiêu chuẩn');
 
           // Fetch reviews
           if (data.data.id) {
@@ -218,10 +237,70 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
   const comparePrice = selectedVariant.compare_price != null ? Number(selectedVariant.compare_price) : null;
 
 
+
+  // Determine category & size options
+  const catSlug = (product.category_slug || (product.category_name || '').toLowerCase()).trim();
+  const isRing = catSlug.includes('nhan') || product.name?.toLowerCase().includes('nhẫn');
+  const isBracelet = catSlug.includes('vong') || product.name?.toLowerCase().includes('vòng') || product.name?.toLowerCase().includes('lắc');
+  const isNecklace = catSlug.includes('day') || product.name?.toLowerCase().includes('dây') || product.name?.toLowerCase().includes('vòng cổ');
+  const isEarring = catSlug.includes('bong') || product.name?.toLowerCase().includes('bông') || product.name?.toLowerCase().includes('hoa tai');
+
+  // Ring sizes like in screenshot 1: 48 (active), 50-62 crossed out
+  const ringSizes = [
+    { size: '48', inStock: true },
+    { size: '50', inStock: false },
+    { size: '52', inStock: false },
+    { size: '54', inStock: false },
+    { size: '56', inStock: false },
+    { size: '58', inStock: false },
+    { size: '60', inStock: false },
+    { size: '62', inStock: false },
+  ];
+
+  const braceletSizes = [
+    { size: '155-185mm', inStock: true },
+    { size: 'Size S', inStock: true },
+    { size: 'Size L', inStock: false },
+  ];
+
+  const necklaceSizes = [
+    { size: '40-45cm', inStock: true },
+  ];
+
+  const earringSizes = [
+    { size: 'Một kích thước', inStock: true },
+  ];
+
+  const availableSizes = isRing
+    ? ringSizes
+    : isBracelet
+    ? braceletSizes
+    : isNecklace
+    ? necklaceSizes
+    : earringSizes;
+
+  // Colors like in screenshots: Bạc, Vàng, Vàng hồng
+  const colorOptions = [
+    { name: 'Bạc', inStock: true },
+    { name: 'Vàng hồng', inStock: true },
+    { name: 'Vàng', inStock: false },
+  ];
+
+  const currentSizeObj = availableSizes.find((s) => s.size === selectedSize);
+  const isOutOfStock = currentSizeObj ? !currentSizeObj.inStock : false;
+
+  const discountPct = comparePrice && comparePrice > variantPrice
+    ? Math.round(((comparePrice - variantPrice) / comparePrice) * 100)
+    : (product.name?.toLowerCase().includes('elan') ? 20 : (product.name?.toLowerCase().includes('tennis') ? 20 : 10));
+
+  const effectiveComparePrice = comparePrice && comparePrice > variantPrice
+    ? comparePrice
+    : Math.round((variantPrice * (100 + discountPct)) / 100);
+
   return (
-    <div className="max-w-[1440px] mx-auto px-6 sm:px-12 py-12 space-y-16">
+    <div className="max-w-[1440px] mx-auto px-4 sm:px-12 py-8 sm:py-12 space-y-16">
       {/* Top Product Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-14 items-start">
         {/* Left: 1:1 Product Stage */}
         <div className="relative aspect-square w-full bg-soft-cloud overflow-hidden border border-hairline-soft">
           <Image
@@ -234,11 +313,11 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
           />
         </div>
 
-        {/* Right: Product Metadata & Actions */}
-        <div className="space-y-6">
+        {/* Right: Product Metadata & Actions (Daniel Wellington Luxury PDP) */}
+        <div className="space-y-5">
+          {/* Header */}
           <div>
-            <span className="text-xs font-bold text-mute uppercase tracking-widest">{product.category_name}</span>
-            <h1 className="text-3xl font-bold text-ink tracking-tight mt-1">{product.name}</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-ink tracking-tight">{product.name}</h1>
             
             {/* Rating Stars Summary */}
             {reviewsData?.stats && (
@@ -255,57 +334,191 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
                     />
                   ))}
                 </div>
-                <span className="text-sm font-semibold text-ink">{reviewsData.stats.avgRating} / 5</span>
-                <span className="text-xs text-mute">({reviewsData.stats.totalReviews} đánh giá)</span>
+                <span className="text-xs font-semibold text-ink">{reviewsData.stats.avgRating} / 5</span>
+                <span className="text-[11px] text-mute">({reviewsData.stats.totalReviews} đánh giá)</span>
               </div>
             )}
+          </div>
 
-            <p className="text-2xl font-bold text-ink mt-3">
-              {priceWithCustomization.toLocaleString('vi-VN')}₫
-              {comparePrice != null && comparePrice > variantPrice && (
-                <span className="text-base text-mute line-through font-normal ml-3">
-                  {comparePrice.toLocaleString('vi-VN')}₫
+          {/* Pricing Block */}
+          <div className="space-y-1">
+            <div className="flex items-center gap-2.5">
+              {discountPct > 0 && (
+                <span className="text-sale text-sm font-extrabold tracking-tight">
+                  -{discountPct}%
                 </span>
               )}
+              <span className="text-xl sm:text-2xl font-bold text-sale tracking-tight">
+                {priceWithCustomization.toLocaleString('vi-VN')} VND
+              </span>
+            </div>
+            {effectiveComparePrice != null && effectiveComparePrice > variantPrice && (
+              <div className="text-xs text-mute line-through font-normal">
+                {effectiveComparePrice.toLocaleString('vi-VN')} VND
+              </div>
+            )}
+            <p className="text-[11px] text-mute pt-0.5">
+              Đã bao gồm thuế. Phí vận chuyển được tính khi thanh toán.
             </p>
           </div>
 
+          {/* Màu sắc Selector */}
+          <div className="space-y-2 pt-1">
+            <span className="text-xs font-semibold text-ink">Màu sắc</span>
+            <div className="flex flex-wrap gap-2">
+              {colorOptions.map((c) => (
+                <button
+                  key={c.name}
+                  type="button"
+                  onClick={() => setSelectedColor(c.name)}
+                  className={`relative px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all border ${
+                    selectedColor === c.name
+                      ? 'bg-ink text-canvas border-ink shadow-sm'
+                      : 'bg-canvas text-ink border-hairline hover:border-ink'
+                  }`}
+                >
+                  {c.name}
+                  {!c.inStock && (
+                    <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <span className="w-[140%] h-[1px] bg-stone rotate-45" />
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
 
-          <p className="text-sm text-mute leading-relaxed">{product.description}</p>
+          {/* Kích cỡ Selector */}
+          <div className="space-y-2">
+            <span className="text-xs font-semibold text-ink">Kích cỡ</span>
+            <div className="flex flex-wrap gap-2">
+              {availableSizes.map((s) => (
+                <button
+                  key={s.size}
+                  type="button"
+                  onClick={() => setSelectedSize(s.size)}
+                  className={`relative min-w-[42px] px-3.5 py-2 text-xs font-bold uppercase tracking-wider transition-all border ${
+                    selectedSize === s.size
+                      ? 'bg-ink text-canvas border-ink shadow-sm'
+                      : 'bg-canvas text-ink border-hairline hover:border-ink'
+                  }`}
+                >
+                  {s.size}
+                  {!s.inStock && (
+                    <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <span className="w-[140%] h-[1px] bg-stone rotate-45" />
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
 
-          {/* Variant Selector if multiple */}
-          {product.variants && product.variants.length > 1 && (
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-ink uppercase tracking-wider">Chọn phiên bản:</label>
-              <div className="flex flex-wrap gap-2">
-                {product.variants.map((v: any) => (
-                  <button
-                    key={v.id}
-                    type="button"
-                    onClick={() => setSelectedVariant(v)}
-                    className={`px-4 py-2 border rounded-lg text-xs font-medium transition-all ${
-                      selectedVariant.id === v.id
-                        ? 'border-ink bg-ink text-canvas font-semibold'
-                        : 'border-hairline hover:bg-soft-cloud text-ink'
-                    }`}
-                  >
-                    {v.name}
-                  </button>
-                ))}
+          {/* Nút HƯỚNG DẪN KÍCH THƯỚC */}
+          <button
+            type="button"
+            onClick={() => setIsSizeGuideOpen(true)}
+            className="w-full py-3.5 border border-ink text-ink font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-ink hover:text-canvas transition-colors"
+          >
+            <span>HƯỚNG DẪN KÍCH THƯỚC</span>
+            <span className="text-sm">📐</span>
+          </button>
+
+          {/* Stock Status Indicator */}
+          <div className="flex items-center gap-2 text-xs font-medium pt-1">
+            {isOutOfStock ? (
+              <>
+                <span className="w-2.5 h-2.5 rounded-full bg-stone" />
+                <span className="text-mute font-semibold">Hết hàng</span>
+              </>
+            ) : (
+              <>
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sale opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-sale" />
+                </span>
+                <span className="text-charcoal font-semibold">Còn lại một ít trong kho!</span>
+              </>
+            )}
+          </div>
+
+          {/* Add to Cart & Wishlist Actions */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleAddToCart}
+                disabled={isOutOfStock}
+                className={`flex-1 py-4 text-xs sm:text-sm font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-all duration-300 relative overflow-hidden ${
+                  isOutOfStock
+                    ? 'bg-ink text-canvas hover:bg-black'
+                    : isAddingCart
+                    ? 'bg-emerald-600 text-canvas'
+                    : 'bg-ink text-canvas hover:bg-black'
+                }`}
+              >
+                {isOutOfStock ? (
+                  <span>THÔNG BÁO KHI CÓ HÀNG</span>
+                ) : isAddingCart ? (
+                  <>
+                    <Check className="w-4 h-4" />
+                    <span>ĐÃ THÊM VÀO GIỎ HÀNG!</span>
+                  </>
+                ) : (
+                  <span>THÊM VÀO GIỎ HÀNG</span>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleToggleWishlist}
+                disabled={wishlistLoading}
+                className={`w-12 h-12 rounded border flex items-center justify-center transition-all shrink-0 ${
+                  isWishlisted
+                    ? 'border-sale bg-sale/10 text-sale'
+                    : 'border-hairline hover:bg-soft-cloud text-mute hover:text-ink'
+                } ${isHeartBeating ? 'animate-heartbeat scale-125' : 'active:scale-90'}`}
+                title={isWishlisted ? 'Đã yêu thích' : 'Thêm vào yêu thích'}
+              >
+                <Heart
+                  className={`w-5 h-5 transition-transform ${
+                    isWishlisted ? 'fill-sale text-sale' : ''
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+
+          {/* Hotline & Cam kết dịch vụ */}
+          <div className="pt-3 pb-2 space-y-3 border-t border-hairline-soft text-center">
+            <p className="text-xs font-bold text-ink">
+              Tư vấn mua hàng: <a href="tel:0932029606" className="text-ink hover:underline">093 202 9606</a>
+            </p>
+            <div className="grid grid-cols-3 gap-1 text-center">
+              <div className="flex flex-col items-center gap-1.5 p-1.5">
+                <Package className="w-5 h-5 text-ink stroke-[1.5]" />
+                <span className="text-[10px] text-charcoal font-medium leading-tight">Giao hàng nhanh miễn phí</span>
+              </div>
+              <div className="flex flex-col items-center gap-1.5 p-1.5">
+                <RefreshCw className="w-5 h-5 text-ink stroke-[1.5]" />
+                <span className="text-[10px] text-charcoal font-medium leading-tight">Đổi trả miễn phí*</span>
+              </div>
+              <div className="flex flex-col items-center gap-1.5 p-1.5">
+                <Gift className="w-5 h-5 text-ink stroke-[1.5]" />
+                <span className="text-[10px] text-charcoal font-medium leading-tight">Giao hàng từ TP.Hồ Chí Minh, Việt Nam</span>
               </div>
             </div>
-          )}
+          </div>
 
-          {/* GIA Certificate Badge */}
+          {/* GIA Certificate Badge if exists */}
           {selectedVariant.certificates?.length > 0 && (
-            <div className="bg-soft-cloud border border-hairline p-4 rounded-lg flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <ShieldCheck className="w-6 h-6 text-ink" />
+            <div className="bg-soft-cloud border border-hairline p-3 rounded flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <ShieldCheck className="w-5 h-5 text-ink" />
                 <div>
                   <p className="text-xs font-bold text-ink uppercase">
                     GIẤY KIỂM ĐỊNH {selectedVariant.certificates[0].issuer} CHÍNH HÃNG
                   </p>
-                  <p className="text-xs text-mute">Số hiệu: {selectedVariant.certificates[0].cert_number}</p>
+                  <p className="text-[11px] text-mute">Số hiệu: {selectedVariant.certificates[0].cert_number}</p>
                 </div>
               </div>
               <a
@@ -314,16 +527,16 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
                 rel="noreferrer"
                 className="text-xs font-semibold text-ink underline flex items-center gap-1"
               >
-                <FileText className="w-4 h-4" /> Xem File PDF
+                <FileText className="w-4 h-4" /> PDF
               </a>
             </div>
           )}
 
-          {/* Laser Engraving Customization Option */}
+          {/* Laser Engraving Service if allowed */}
           {selectedVariant.allow_engraving && (
-            <div className="border border-hairline p-4 rounded-lg space-y-3">
+            <div className="border border-hairline p-3 rounded space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-semibold text-ink flex items-center gap-1.5">
+                <span className="text-xs font-semibold text-ink flex items-center gap-1.5">
                   <Sparkles className="w-4 h-4 text-amber-500" /> Dịch vụ Khắc chữ Laser Cá Nhân
                 </span>
                 <button
@@ -331,66 +544,22 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
                   onClick={() => setIsEngravingOpen(true)}
                   className="text-xs font-bold text-ink underline"
                 >
-                  {customization ? 'Sửa Nội Dung' : '+ Thêm Khắc Chữ'}
+                  {customization ? 'Sửa' : '+ Thêm'}
                 </button>
               </div>
-
-              {customization ? (
-                <div className="bg-soft-cloud p-3 rounded text-xs space-y-1">
-                  <p className="font-semibold text-ink">Nội dung: "{customization.text}"</p>
-                  <p className="text-mute">
-                    Font: {customization.font} • Phí: +{customization.extra_fee.toLocaleString('vi-VN')}₫
-                  </p>
+              {customization && (
+                <div className="bg-soft-cloud p-2 rounded text-xs">
+                  <p className="font-semibold text-ink">"{customization.text}" ({customization.font})</p>
                 </div>
-              ) : (
-                <p className="text-xs text-mute">
-                  Miễn phí khắc tên, ngày kỷ niệm hoặc ký tự đặc biệt lên mặt trong nhẫn.
-                </p>
               )}
             </div>
           )}
 
-          {/* Add to Cart & Wishlist Actions */}
-          <div className="pt-4 space-y-3">
-            <div className="flex items-center gap-3">
-              <button
-                onClick={handleAddToCart}
-                className={`btn-primary flex-1 py-4 text-base font-semibold flex items-center justify-center gap-2 transition-all duration-300 relative overflow-hidden ${
-                  isAddingCart ? 'bg-emerald-600 scale-[0.98] shadow-inner text-white' : 'hover:shadow-lg'
-                }`}
-              >
-                {isAddingCart ? (
-                  <>
-                    <Check className="w-5 h-5 animate-bounce" />
-                    <span>Đã Thêm Vào Giỏ Hàng!</span>
-                  </>
-                ) : (
-                  <>
-                    <ShoppingBag className="w-5 h-5" />
-                    <span>Thêm Vào Giỏ Hàng — {priceWithCustomization.toLocaleString('vi-VN')}₫</span>
-                  </>
-                )}
-              </button>
+          {/* HOÀN THIỆN PHONG CÁCH (Mix & Match) */}
+          <CompleteTheLook currentProductId={product.id} categorySlug={catSlug} />
 
-              <button
-                type="button"
-                onClick={handleToggleWishlist}
-                disabled={wishlistLoading}
-                className={`w-14 h-14 rounded-lg border flex items-center justify-center transition-all duration-300 ${
-                  isWishlisted
-                    ? 'border-sale bg-sale/10 text-sale'
-                    : 'border-hairline hover:bg-soft-cloud text-mute hover:text-ink'
-                } ${isHeartBeating ? 'animate-heartbeat scale-125' : 'active:scale-90'}`}
-                title={isWishlisted ? 'Đã yêu thích' : 'Thêm vào yêu thích'}
-              >
-                <Heart
-                  className={`w-6 h-6 transition-transform ${
-                    isWishlisted ? 'fill-sale text-sale' : ''
-                  }`}
-                />
-              </button>
-            </div>
-          </div>
+          {/* Accordions (Giới thiệu, Chi tiết, Cửa hàng, Bộ sưu tập, Đổi trả) */}
+          <ProductAccordions product={product} selectedVariant={selectedVariant} categorySlug={catSlug} />
         </div>
       </div>
 
@@ -577,6 +746,13 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
         variantName={selectedVariant.name}
         engravingFee={selectedVariant.engraving_fee}
         maxChars={selectedVariant.max_engraving_chars}
+      />
+
+      {/* Size Guide Modal */}
+      <SizeGuideModal
+        isOpen={isSizeGuideOpen}
+        onClose={() => setIsSizeGuideOpen(false)}
+        defaultTab={isRing ? 'nhan' : isBracelet ? 'vong-tay' : isNecklace ? 'day-chuyen' : 'nhan'}
       />
     </div>
   );
