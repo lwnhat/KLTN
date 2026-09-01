@@ -264,19 +264,25 @@ async function sendPaymentSuccessEmail(orderIdOrNumber, overrideEmail = null) {
       }
 
       return `
-        <div style="display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid #f1f5f9; align-items: center;">
-          <img src="${cleanImg}" alt="${item.product_name_snapshot}" width="72" height="72" style="width: 72px; height: 72px; min-width: 72px; max-width: 72px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; display: block;" />
-
-          <div style="flex: 1; min-width: 0;">
-            <div style="font-weight: 700; font-size: 13px; color: #0f172a; line-height: 1.4; text-transform: uppercase;">${item.product_name_snapshot}</div>
-            <div style="color: #64748b; font-size: 11px; margin-top: 2px;">${item.variant_name_snapshot || 'Tiêu chuẩn'}</div>
-            ${customText ? `<div style="color: #b45309; font-size: 11px; font-weight: 600; margin-top: 2px;">✨ Khắc Laser: "${customText}"</div>` : ''}
-            <div style="margin-top: 6px; display: flex; justify-content: space-between; align-items: baseline;">
-              <span style="font-weight: 700; font-size: 13px; color: #0f172a;">${itemPrice.toLocaleString('vi-VN')}₫</span>
-              <span style="color: #64748b; font-size: 12px; font-weight: 600;">× ${itemQty}</span>
-            </div>
-          </div>
-        </div>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom: 1px solid #f1f5f9; padding: 14px 0;">
+          <tr>
+            <td width="80" valign="top" style="padding-right: 14px;">
+              <img src="${cleanImg}" alt="${item.product_name_snapshot}" width="72" height="72"
+                style="width:72px;height:72px;border-radius:8px;border:1px solid #e2e8f0;display:block;object-fit:cover;" />
+            </td>
+            <td valign="top">
+              <div style="font-weight:700;font-size:13px;color:#0f172a;line-height:1.4;text-transform:uppercase;">${item.product_name_snapshot}</div>
+              <div style="color:#64748b;font-size:11px;margin-top:2px;">${item.variant_name_snapshot || 'Tiêu chuẩn'}</div>
+              ${customText ? `<div style="color:#b45309;font-size:11px;font-weight:600;margin-top:2px;">Khac Laser: "${customText}"</div>` : ''}
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:6px;">
+                <tr>
+                  <td style="font-weight:700;font-size:13px;color:#0f172a;">${itemPrice.toLocaleString('vi-VN')}&#x20AB;</td>
+                  <td align="right" style="color:#64748b;font-size:12px;font-weight:600;">x ${itemQty}</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
       `;
     }).join('');
 
