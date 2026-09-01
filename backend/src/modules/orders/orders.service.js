@@ -343,36 +343,42 @@ async function createOrder(orderData) {
     return newOrder;
   }); // ─── END TRANSACTION ──────────────────────────────────────────────────
 
-  // POST-TRANSACTION: Xóa Redis holds (không cần trong transaction)
+  // 1. Gửi email xác nhận đơn hàng kèm hóa đơn chi tiết về Gmail ngay lập tức (Bất đồng bộ, độc lập, không bị Redis làm gián đoạn)
+  const recipientEmail = customerInfo?.email || (order.customer_snapshot && (typeof order.customer_snapshot === 'string' ? JSON.parse(order.customer_snapshot) : order.customer_snapshot)?.email);
+  if (recipientEmail) {
+    setImmediate(() => {
+      emailService.sendPaymentSuccessEmail(order.id, recipientEmail).catch(err =>
+        console.error('[Email] Failed to send order invoice email:', err.message)
+      );
+    });
+  }
+
+  // 2. POST-TRANSACTION: Dọn dẹp Redis holds & Carts
   try {
     const holdKeys = items.map(
       (item) => `hold:${item.variantId}:${item.cartItemId}`
     );
     if (holdKeys.length > 0) {
-      await redis.del(...holdKeys);
+      await redis.del(...holdKeys).catch(() => {});
     }
 
     // Cache idempotency key trong Redis (15 phút) để fast lookup
-    await redis.setex(redisIdempotencyKey, 900, order.id);
+    await redis.setex(redisIdempotencyKey, 900, order.id).catch(() => {});
 
     // Xóa cart items sau khi đặt hàng thành công
     if (userId) {
-      const cart = await db('carts').where('user_id', userId).first();
+      const cart = await db('carts').where('user_id', userId).first().catch(() => null);
       if (cart) {
         await db('cart_items')
           .where('cart_id', cart.id)
           .whereIn('variant_id', items.map((i) => i.variantId))
-          .delete();
+          .delete()
+          .catch(() => {});
       }
     }
-    // Gửi email xác nhận đơn hàng kèm hóa đơn chi tiết về Gmail (chạy ngầm bất đồng bộ - 0ms delay cho khách hàng)
-    if (customerInfo.email) {
-      setImmediate(() => {
-        emailService.sendPaymentSuccessEmail(order.id, customerInfo.email).catch(err =>
-          console.error('[Email] Failed to send order invoice email:', err.message)
-        );
-      });
-    }
+  } catch (postTxError) {
+    console.warn('[PostTx Cleanup Warning]:', postTxError.message);
+  }
 
 
 
