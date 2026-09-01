@@ -108,26 +108,27 @@ export default async function HomePage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
           {[
             {
-              title: 'NHẮN CẦU HÔN & CƯỚI',
-              image: 'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=800&auto=format&fit=crop&q=80',
-              link: '/products?category=nhan',
-            },
-            {
-              title: 'DÂY CHUYỀN KIM CƯƠNG',
-              image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&auto=format&fit=crop&q=80',
+              title: 'DÂY CHUYỀN ELAN',
+              image: 'https://res.cloudinary.com/akmq0b0f/image/upload/v1788240781/mn-jewelry/products/cwqs6ovoy0e1sxft1tgd.png',
               link: '/products?category=day-chuyen',
             },
             {
-              title: 'BÔNG TAI CAO CẤP',
-              image: 'https://images.unsplash.com/photo-1630019852942-f89202989a59?w=800&auto=format&fit=crop&q=80',
-              link: '/products?category=bong-tai',
+              title: 'VÒNG TAY CLASSIC VÀNG',
+              image: 'https://res.cloudinary.com/akmq0b0f/image/upload/v1788237149/mn-jewelry/products/mo67cculr0ltpiyl0w4c.png',
+              link: '/products?category=vong-tay',
             },
             {
-              title: 'VÒNG TAY & LẮC VÀNG',
-              image: 'https://images.unsplash.com/photo-1611591475179-6fe5e7e597c1?w=800&auto=format&fit=crop&q=80',
+              title: 'VÒNG TAY LUMINE BẠC',
+              image: 'https://res.cloudinary.com/akmq0b0f/image/upload/v1788110991/mn-jewelry/products/e6zdowf2ix08i214ek0v.png',
+              link: '/products?category=vong-tay',
+            },
+            {
+              title: 'VÒNG TAY VÀNG HỒNG',
+              image: 'https://res.cloudinary.com/akmq0b0f/image/upload/v1788240924/mn-jewelry/products/bo2eep6wcgnwzdpmyjyn.png',
               link: '/products?category=vong-tay',
             },
           ].map((cat, index) => (
+
             <div key={index} className="relative aspect-[4/5] bg-soft-cloud group overflow-hidden">
               <Image
                 src={cat.image}
