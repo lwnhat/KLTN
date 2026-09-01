@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <defs>
+    <!-- Ultra-Luxe Champagne Gold Gradient -->
+    <linearGradient id="luxuryGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ca9e52" />
+      <stop offset="20%" stop-color="#f5e2a8" />
+      <stop offset="40%" stop-color="#dfba73" />
+      <stop offset="60%" stop-color="#fff9e6" />
+      <stop offset="80%" stop-color="#c59847" />
+      <stop offset="100%" stop-color="#8a6422" />
+    </linearGradient>
+
+    <!-- Warm Gold Gradient for Delicate Linework -->
+    <linearGradient id="lineGold" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#9a7428" />
+      <stop offset="35%" stop-color="#e8cd87" />
+      <stop offset="70%" stop-color="#fdf4cd" />
+      <stop offset="100%" stop-color="#b88934" />
+    </linearGradient>
+
+    <!-- Deep Luxury Obsidian Radial Background -->
+    <radialGradient id="obsidianBg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#141c2e" />
+      <stop offset="55%" stop-color="#0b0f19" />
+      <stop offset="100%" stop-color="#030712" />
+    </radialGradient>
+
+    <!-- Soft Golden Glow -->
+    <filter id="diamondShimmer" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="glow" />
+      <feComposite in="SourceGraphic" in2="glow" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Luxury Background Plaque -->
+  <rect x="20" y="20" width="560" height="560" rx="120" fill="url(#obsidianBg)" stroke="url(#lineGold)" stroke-width="2.5" />
+
+  <!-- Outer Emerald-Cut Facet Geometry -->
+  <g transform="translate(300, 245)" filter="url(#diamondShimmer)">
+    <!-- Octagon Emerald Cut Outer Frame -->
+    <polygon points="-160,-110 -110,-160 110,-160 160,-110 160,110 110,160 -110,160 -160,110" 
+             fill="none" stroke="url(#lineGold)" stroke-width="2" opacity="0.85" />
+    
+    <!-- Octagon Emerald Cut Inner Frame -->
+    <polygon points="-142,-98 -98,-142 98,-142 142,-98 142,98 98,142 -98,142 -142,98" 
+             fill="none" stroke="url(#lineGold)" stroke-width="1" stroke-dasharray="3 6" opacity="0.6" />
+
+    <!-- Corner Diamond Facet Connector Lines -->
+    <line x1="-160" y1="-110" x2="-142" y2="-98" stroke="url(#lineGold)" stroke-width="1.5" />
+    <line x1="-110" y1="-160" x2="-98" y2="-142" stroke="url(#lineGold)" stroke-width="1.5" />
+    <line x1="110" y1="-160" x2="98" y2="-142" stroke="url(#lineGold)" stroke-width="1.5" />
+    <line x1="160" y1="-110" x2="142" y2="-98" stroke="url(#lineGold)" stroke-width="1.5" />
+    <line x1="160" y1="110" x2="142" y2="98" stroke="url(#lineGold)" stroke-width="1.5" />
+    <line x1="110" y1="160" x2="98" y2="142" stroke="url(#lineGold)" stroke-width="1.5" />
+    <line x1="-110" y1="160" x2="-98" y2="142" stroke="url(#lineGold)" stroke-width="1.5" />
+    <line x1="-160" y1="110" x2="-142" y2="98" stroke="url(#lineGold)" stroke-width="1.5" />
+
+    <!-- Top Solitaire Diamond Crown -->
+    <g transform="translate(0, -160)">
+      <!-- Diamond Gem Facets -->
+      <polygon points="0,-32 24,-14 16,0 -16,0 -24,-14" fill="url(#luxuryGold)" />
+      <polygon points="0,-32 0,0 16,0 24,-14" fill="#ffffff" opacity="0.35" />
+      <polygon points="0,-32 -24,-14 -10,-14" fill="#fff9e6" opacity="0.5" />
+      <polygon points="0,-32 10,-14 24,-14" fill="#8a6422" opacity="0.4" />
+      <!-- Radiant Sparkle Stars -->
+      <path d="M 0 -44 L 2 -34 L 12 -32 L 2 -30 L 0 -20 L -2 -30 L -12 -32 L -2 -34 Z" fill="#ffffff" />
+    </g>
+
+    <!-- ─── ELEGANT INTERTWINED MONOGRAM 'M' & 'N' ─── -->
+    <!-- Letter M (Roman Serif Silhouette) -->
+    <g fill="url(#luxuryGold)">
+      <!-- Left Stem of M with Head/Foot Serifs -->
+      <path d="M -88 -75 L -62 -75 L -62 -65 L -71 -65 L -71 65 L -60 65 L -60 75 L -92 75 L -92 65 L -81 65 L -81 -65 L -88 -65 Z" />
+      
+      <!-- Right Stem of M / Intersecting with N -->
+      <path d="M 6 -75 L 32 -75 L 32 -65 L 23 -65 L 23 65 L 34 65 L 34 75 L 2 75 L 2 65 L 13 65 L 13 -65 L 6 -65 Z" />
+
+      <!-- Diagonal V of M -->
+      <path d="M -75 -65 L -26 48 L -20 48 L 26 -65 L 12 -65 L -23 24 L -58 -65 Z" />
+    </g>
+
+    <!-- Letter N (Intertwined Golden Script / Serif) -->
+    <g fill="url(#luxuryGold)">
+      <!-- Diagonal of N sweeping across right side -->
+      <path d="M 19 -65 L 72 50 L 76 50 L 76 -65 L 66 -65 L 66 -75 L 94 -75 L 94 -65 L 86 -65 L 86 75 L 70 75 L 17 -40 L 17 -65 Z" />
+      <!-- Right Stem Serif of N -->
+      <path d="M 86 65 L 96 65 L 96 75 L 68 75 L 68 65 L 76 65 L 76 40 L 86 62 Z" />
+    </g>
+
+    <!-- Center Sparkle Accent -->
+    <circle cx="-23" cy="-10" r="2.5" fill="#ffffff" />
+    <circle cx="23" cy="15" r="2" fill="#ffffff" />
+  </g>
+
+  <!-- ─── BRAND TYPOGRAPHY ─── -->
+  <text x="300" y="475" text-anchor="middle" font-family="'Plus Jakarta Sans', 'Playfair Display', 'Cinzel', serif" font-size="32" font-weight="700" letter-spacing="14" fill="url(#luxuryGold)">
+    MN
+  </text>
+  <text x="300" y="505" text-anchor="middle" font-family="'Plus Jakarta Sans', 'Inter', sans-serif" font-size="14" font-weight="600" letter-spacing="8" fill="url(#lineGold)">
+    FINE JEWELRY
+  </text>
+  <text x="300" y="530" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="9" font-weight="500" letter-spacing="4" fill="#64748b">
+    HAUTE JOAILLERIE • PARIS
+  </text>
+</svg>

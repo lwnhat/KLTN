@@ -1,0 +1,96 @@
+name: CI/CD Pipeline - Build, Test & Deploy to Server
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    name: Build & Verify All 3 Apps
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # 1. Build Backend
+      - name: Install & Build Backend
+        run: |
+          cd backend
+          npm ci --legacy-peer-deps
+
+      # 2. Build Storefront Next.js
+      - name: Install & Build Storefront
+        run: |
+          cd storefront
+          npm ci --legacy-peer-deps
+          npm run build
+
+      # 3. Build Admin React Panel
+      - name: Install & Build Admin Panel
+        run: |
+          cd admin
+          npm ci --legacy-peer-deps
+          npm run build
+
+  deploy-to-server:
+    name: Build & Deploy Docker Containers
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & Push Backend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/kltn-backend:latest
+
+      - name: Build & Push Storefront Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./storefront
+          file: ./storefront/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/kltn-storefront:latest
+
+      - name: Build & Push Admin Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./admin
+          file: ./admin/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/kltn-admin:latest
+
+      - name: SSH & Deploy to VPS Server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd /opt/kltn-jewelry
+            docker compose pull
+            docker compose up -d --remove-orphans
+            docker image prune -f

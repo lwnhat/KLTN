@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Dancing+Script:wght@600&family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --canvas: #ffffff;
+  --ink: #111111;
+  --soft-cloud: #f5f5f5;
+}
+
+body {
+  background-color: var(--canvas);
+  color: var(--ink);
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Editorial campaign header font */
+.font-display-campaign {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.02em;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+/* Engraving font previews */
+.font-script {
+  font-family: 'Dancing Script', cursive;
+}
+
+/* Base button defaults adhering to design system */
+.btn-primary {
+  @apply bg-ink text-white font-medium px-8 py-3.5 rounded-lg text-base transition-transform active:scale-95 inline-flex items-center justify-center;
+}
+
+.btn-secondary {
+  @apply bg-soft-cloud text-ink font-medium px-8 py-3.5 rounded-lg text-base hover:bg-hairline-soft transition-transform active:scale-95 inline-flex items-center justify-center;
+}
+
+.btn-outline-image {
+  @apply bg-canvas text-ink font-medium px-6 py-3 rounded-lg text-base shadow-sm hover:bg-soft-cloud transition-all active:scale-95 inline-flex items-center justify-center;
+}
+
+@keyframes progress-bar {
+  0% {
+    width: 100%;
+  }
+  100% {
+    width: 0%;
+  }
+}
+
+@keyframes toastSlideInRight {
+  0% {
+    transform: translateX(100%) scale(0.95);
+    opacity: 0;
+  }
+  60% {
+    transform: translateX(-8px) scale(1.02);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.luxury-toast-enter {
+  animation: toastSlideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
