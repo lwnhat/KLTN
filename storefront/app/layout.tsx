@@ -6,6 +6,15 @@ import Footer from '@/components/layout/Footer';
 export const metadata: Metadata = {
   title: 'Daniel Wellington — Trang Sức & Đồng Hồ Cao Cấp',
   description: 'Thương hiệu Daniel Wellington chính hãng. Thiết kế thanh lịch chuẩn phong cách Bắc Âu, miễn phí khắc chữ laser, giao hàng tận nơi toàn quốc.',
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.png', type: 'image/png' },
+      { url: '/favicon.ico' },
+    ],
+    shortcut: '/favicon.svg',
+    apple: '/apple-touch-icon.png',
+  },
 };
 
 
