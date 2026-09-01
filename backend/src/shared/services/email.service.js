@@ -1,68 +1,46 @@
 /**
- * EMAIL SERVICE — Nodemailer
+ * EMAIL SERVICE — Resend HTTP API
  *
- * Dev mode: Dùng Ethereal (fake SMTP) để xem email mà không cần cấu hình thật
- * Production: Cấu hình SMTP qua .env
+ * Render.com chặn tất cả outbound SMTP (port 25, 465, 587).
+ * Giải pháp: Dùng Resend API giao tiếp qua HTTPS port 443 — không bao giờ bị chặn.
+ * Free tier: 3,000 email/tháng, 100 email/ngày.
+ * Docs: https://resend.com/docs
  */
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-function createGmailTransport(port = 587, secure = false) {
-  const smtpUser = (process.env.SMTP_USER && !process.env.SMTP_USER.includes('your_email'))
-    ? process.env.SMTP_USER.trim()
-    : 'lengocminhnhat3@gmail.com';
+const RESEND_API_KEY = process.env.RESEND_API_KEY || null;
 
-  const smtpPass = (process.env.SMTP_PASS && !process.env.SMTP_PASS.includes('your_app_password'))
-    ? process.env.SMTP_PASS.replace(/\s+/g, '')
-    : 'abvtfatckrlltwjv';
+function getResend() {
+  if (!RESEND_API_KEY) {
+    throw new Error('[Email] RESEND_API_KEY chưa được cấu hình trong biến môi trường!');
+  }
+  return new Resend(RESEND_API_KEY);
+}
 
-  return nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: port,
-    secure: secure,
-    connectionTimeout: 8000,
-    greetingTimeout: 8000,
-    socketTimeout: 12000,
-    auth: {
-      user: smtpUser,
-      pass: smtpPass,
-    },
-    tls: {
-      rejectUnauthorized: false,
-    },
+async function sendMailWithResend({ from, to, subject, html }) {
+  const resend = getResend();
+  const { data, error } = await resend.emails.send({
+    from: from || 'Daniel Wellington <onboarding@resend.dev>',
+    to: Array.isArray(to) ? to : [to],
+    subject,
+    html,
   });
+  if (error) {
+    console.error('[Resend Error]:', error);
+    throw new Error(error.message || 'Resend API error');
+  }
+  console.log(`📧 [Resend Sent] To: ${to} | ID: ${data?.id}`);
+  return { messageId: data?.id };
 }
 
-async function sendMailWithRetry(mailOptions) {
-  // Ưu tiên Cổng 587 STARTTLS (nhanh, chuẩn RFC, không bị cloud hosting chặn hay treo socket)
-  try {
-    const t587 = createGmailTransport(587, false);
-    const info = await t587.sendMail(mailOptions);
-    console.log(`📧 [Gmail 587 STARTTLS Sent] To: ${mailOptions.to} | ID: ${info.messageId}`);
-    return info;
-  } catch (err587) {
-    console.warn(`⚠️ [Gmail 587 failed: ${err587.message}], tự động thử lại Cổng 465 SSL...`);
-  }
-
-  // Dự phòng: Cổng 465 SSL
-  try {
-    const t465 = createGmailTransport(465, true);
-    const info = await t465.sendMail(mailOptions);
-    console.log(`📧 [Gmail 465 SSL Fallback Sent] To: ${mailOptions.to} | ID: ${info.messageId}`);
-    return info;
-  } catch (err465) {
-    console.error(`❌ [Gmail 465 SSL Error]:`, err465.message);
-    throw err465;
-  }
-}
-
-const FROM = process.env.EMAIL_FROM || '"Daniel Wellington 💎" <lengocminhnhat3@gmail.com>';
+const FROM = 'Daniel Wellington <onboarding@resend.dev>';
 
 /**
 
  * Gửi email xác thực tài khoản (OTP)
  */
 async function sendVerificationEmail({ to, fullName, otp }) {
-  const info = await sendMailWithRetry({
+  const info = await sendMailWithResend({
     from: FROM,
     to,
     subject: 'Xác thực tài khoản KLTN Jewelry',
@@ -105,7 +83,7 @@ async function sendOrderConfirmationEmail({ to, customerName, orderNumber, total
     </tr>
   `).join('');
 
-  const info = await sendMailWithRetry({
+  const info = await sendMailWithResend({
     from: FROM,
     to,
     subject: `✅ Xác nhận đơn hàng ${orderNumber} — KLTN Jewelry`,
@@ -153,7 +131,7 @@ async function sendOrderConfirmationEmail({ to, customerName, orderNumber, total
  * Gửi email reset password (OTP)
  */
 async function sendResetPasswordEmail({ to, otp }) {
-  const info = await sendMailWithRetry({
+  const info = await sendMailWithResend({
     from: FROM,
     to,
     subject: 'Đặt lại mật khẩu — Daniel Wellington',
@@ -467,19 +445,13 @@ async function sendPaymentSuccessEmail(orderIdOrNumber, overrideEmail = null) {
 </html>
     `;
 
-    const mailOptions = {
+    const info = await sendMailWithResend({
       from: FROM,
       to: customerEmail,
       subject: emailSubject,
       html: htmlContent,
-    };
-
-    const info = await sendMailWithRetry(mailOptions);
+    });
     console.log(`📧 [Payment Success Email Sent] Order: ${orderNumber} | To: ${customerEmail} | ID: ${info.messageId}`);
-    if (info && nodemailer.getTestMessageUrl) {
-      const previewUrl = nodemailer.getTestMessageUrl(info);
-      if (previewUrl) console.log(`🔗 [Email Preview URL]: ${previewUrl}`);
-    }
     return info;
   } catch (err) {
     console.error(`[Email Service Error] Failed to send payment success email for order ${orderIdOrNumber}:`, err);
@@ -492,6 +464,6 @@ module.exports = {
   sendOrderConfirmationEmail,
   sendResetPasswordEmail,
   sendPaymentSuccessEmail,
-  sendMailWithRetry,
+  sendMailWithResend,
 };
 
