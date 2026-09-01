@@ -130,15 +130,11 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-40 bg-canvas/95 backdrop-blur-md border-b border-hairline transition-all duration-300">
       {/* Top Banner */}
-      <div className="bg-ink text-canvas text-xs py-2 px-4 sm:px-6 tracking-wide flex justify-center md:justify-between items-center select-none text-center">
-        <div className="flex items-center gap-2 sm:gap-4">
-          <span className="flex items-center gap-1.5 font-medium text-[11px] sm:text-xs">
-            ✨ Kiểm định GIA & DOJI chính hãng
-          </span>
+      <div className="bg-ink text-canvas text-xs py-2 px-3 sm:px-6 tracking-wide flex justify-center md:justify-between items-center select-none text-center">
+        <div className="flex items-center justify-center gap-2 sm:gap-4 text-[11px] sm:text-xs font-medium whitespace-nowrap overflow-hidden">
+          <span>✨ Kiểm định GIA & DOJI</span>
           <span className="text-mute/60">•</span>
-          <span className="inline-flex items-center gap-1.5 font-medium text-[11px] sm:text-xs">
-            💎 Khắc chữ Laser miễn phí
-          </span>
+          <span>💎 Khắc Laser miễn phí</span>
         </div>
         <div className="hidden md:flex items-center gap-4 text-canvas/80">
           <Link href="/warranty" className="hover:text-canvas transition-colors flex items-center gap-1">
@@ -150,21 +146,18 @@ export default function Header() {
       </div>
 
       {/* Main Navbar */}
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-12 h-16 sm:h-20 flex items-center justify-between gap-3 sm:gap-6">
+      <div className="max-w-[1440px] mx-auto px-3 sm:px-12 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-6">
         {/* Brand Logo */}
-        <Link href="/" className="shrink-0">
+        <Link href="/" className="shrink-0 scale-90 sm:scale-100 origin-left">
           <LuxuryLogo size="md" />
         </Link>
-
-
-
 
         {/* Navigation Categories */}
         <nav className="hidden lg:flex items-center gap-8 text-sm font-medium text-ink">
           <Link
             href="/products"
             className={`transition-colors hover:text-stone uppercase tracking-wider py-1 ${
-              pathname === '/products' ? 'border-b-2 border-ink' : ''
+              pathname === '/products' ? 'text-sand font-bold border-b-2 border-sand' : ''
             }`}
           >
             Tất Cả Sản Phẩm
@@ -196,7 +189,7 @@ export default function Header() {
         </nav>
 
         {/* Actions & Utilities */}
-        <div className="flex items-center gap-4 shrink-0">
+        <div className="flex items-center gap-1 sm:gap-4 shrink-0">
           {/* Search Bar */}
           <div className="relative hidden md:block w-48 lg:w-64">
             <input
@@ -220,13 +213,13 @@ export default function Header() {
               <div>
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="flex items-center gap-2 text-xs font-semibold py-2 px-3 rounded-full hover:bg-soft-cloud transition-colors border border-hairline"
+                  className="flex items-center gap-1.5 text-xs font-semibold p-1 sm:py-2 sm:px-3 rounded-full hover:bg-soft-cloud transition-colors border border-hairline"
                 >
                   <div className="w-6 h-6 rounded-full bg-ink text-canvas flex items-center justify-center text-[10px]">
                     {user.fullName ? user.fullName[0].toUpperCase() : 'U'}
                   </div>
                   <span className="hidden sm:inline-block max-w-[100px] truncate">{user.fullName}</span>
-                  <ChevronDown className="w-3.5 h-3.5 text-mute" />
+                  <ChevronDown className="w-3.5 h-3.5 text-mute hidden sm:inline-block" />
                 </button>
 
                 {dropdownOpen && (
@@ -245,8 +238,6 @@ export default function Header() {
                         Quản Trị Admin Panel
                       </a>
                     )}
-
-
 
                     <Link
                       href="/account/dashboard"
@@ -290,10 +281,10 @@ export default function Header() {
             ) : (
               <Link
                 href="/account"
-                className="flex items-center gap-1.5 text-xs font-semibold hover:text-stone transition-colors py-2 px-3"
+                className="p-2 rounded-full hover:bg-soft-cloud transition-colors flex items-center justify-center text-ink"
+                title="Đăng Nhập"
               >
-                <User className="w-4 h-4" />
-                <span className="hidden sm:inline-block">Đăng Nhập</span>
+                <User className="w-5 h-5" />
               </Link>
             )}
           </div>
@@ -302,12 +293,12 @@ export default function Header() {
           <Link
             href="/cart"
             aria-label="Giỏ hàng"
-            className="relative p-2.5 rounded-full hover:bg-soft-cloud transition-colors flex items-center justify-center group"
+            className="relative p-2 rounded-full hover:bg-soft-cloud transition-colors flex items-center justify-center group"
           >
             <ShoppingBag className="w-5 h-5 text-ink transition-transform group-hover:scale-110" />
             {itemCount > 0 && (
               <span
-                className={`absolute -top-1 -right-1 bg-ink text-canvas text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-canvas transition-all ${
+                className={`absolute -top-0.5 -right-0.5 bg-ink text-canvas text-[10px] font-bold w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center border border-canvas transition-all ${
                   isCartBouncing ? 'animate-cart-bounce bg-amber-500 shadow-lg scale-125' : ''
                 }`}
               >
@@ -318,79 +309,98 @@ export default function Header() {
 
           {/* Mobile Hamburger Button */}
           <button
+            type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-lg hover:bg-soft-cloud text-ink transition-colors"
+            className="lg:hidden w-10 h-10 rounded-lg hover:bg-soft-cloud active:bg-hairline text-ink transition-colors flex items-center justify-center shrink-0"
             aria-label="Toggle Menu"
+            aria-expanded={mobileMenuOpen}
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </div>
 
       {/* Mobile Slide-Down Drawer */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-canvas border-t border-hairline px-6 py-5 space-y-5 shadow-2xl animate-in slide-in-from-top-2 duration-200">
-          {/* Mobile Search */}
-          <div className="relative w-full">
-            <input
-              type="text"
-              placeholder="Tìm trang sức, kim cương..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && searchQuery.trim()) {
-                  setMobileMenuOpen(false);
-                  window.location.href = `/products?search=${encodeURIComponent(searchQuery.trim())}`;
-                }
-              }}
-              className="w-full pl-9 pr-4 py-2 text-xs bg-soft-cloud border border-hairline focus:border-ink rounded-full outline-none transition-all placeholder:text-mute"
-            />
-            <Search className="w-4 h-4 text-mute absolute left-3 top-2.5" />
-          </div>
+        <>
+          {/* Backdrop overlay */}
+          <div
+            className="lg:hidden fixed inset-0 top-[88px] bg-ink/40 backdrop-blur-sm z-40 transition-opacity"
+            onClick={() => setMobileMenuOpen(false)}
+          />
 
-          {/* Mobile Categories */}
-          <div className="space-y-1">
-            <p className="text-[10px] uppercase font-bold tracking-wider text-mute mb-2 px-2">Danh mục sản phẩm</p>
-            {[
-              { href: '/products', label: 'Tất Cả Sản Phẩm' },
-              { href: '/products?category=nhan', label: 'Nhẫn Kim Cương' },
-              { href: '/products?category=day-chuyen', label: 'Dây Chuyền' },
-              { href: '/products?category=bong-tai', label: 'Bông Tai' },
-              { href: '/products?category=vong-tay', label: 'Vòng Tay' },
-            ].map((item) => (
+          {/* Drawer Content */}
+          <div className="lg:hidden absolute top-full inset-x-0 bg-canvas border-t border-hairline px-5 py-5 space-y-4 shadow-2xl max-h-[calc(100vh-88px)] overflow-y-auto z-50 animate-in slide-in-from-top-2 duration-200">
+            {/* Mobile Search */}
+            <div className="relative w-full">
+              <input
+                type="text"
+                placeholder="Tìm trang sức, kim cương..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && searchQuery.trim()) {
+                    setMobileMenuOpen(false);
+                    window.location.href = `/products?search=${encodeURIComponent(searchQuery.trim())}`;
+                  }
+                }}
+                className="w-full pl-9 pr-4 py-2.5 text-xs bg-soft-cloud border border-hairline focus:border-ink rounded-full outline-none transition-all placeholder:text-mute"
+              />
+              <Search className="w-4 h-4 text-mute absolute left-3 top-3" />
+            </div>
+
+            {/* Mobile Categories */}
+            <div className="space-y-1">
+              <p className="text-[10px] uppercase font-bold tracking-wider text-mute mb-2 px-2">Danh mục sản phẩm</p>
+              {[
+                { href: '/products', label: 'Tất Cả Sản Phẩm' },
+                { href: '/products?category=nhan', label: 'Nhẫn Kim Cương' },
+                { href: '/products?category=day-chuyen', label: 'Dây Chuyền' },
+                { href: '/products?category=bong-tai', label: 'Bông Tai' },
+                { href: '/products?category=vong-tay', label: 'Vòng Tay' },
+              ].map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`block px-3 py-2.5 text-sm rounded-lg font-medium transition-colors ${
+                    pathname === item.href ? 'bg-ink text-canvas font-semibold' : 'text-ink hover:bg-soft-cloud'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+
+            {/* Mobile Extra Links */}
+            <div className="pt-3 border-t border-hairline space-y-1">
               <Link
-                key={item.href}
-                href={item.href}
+                href="/warranty"
                 onClick={() => setMobileMenuOpen(false)}
-                className={`block px-3 py-2 text-sm rounded-lg font-medium transition-colors ${
-                  pathname === item.href ? 'bg-ink text-canvas font-semibold' : 'text-ink hover:bg-soft-cloud'
-                }`}
+                className="flex items-center gap-2 px-3 py-2.5 text-xs font-semibold text-ink hover:bg-soft-cloud rounded-lg transition-colors"
               >
-                {item.label}
+                <ShieldCheck className="w-4 h-4 text-amber-600" />
+                Tra Cứu Bảo Hành Điện Tử
               </Link>
-            ))}
+              <Link
+                href="/account/wishlist"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 px-3 py-2.5 text-xs font-semibold text-ink hover:bg-soft-cloud rounded-lg transition-colors"
+              >
+                <Heart className="w-4 h-4 text-rose-500" />
+                Danh Sách Yêu Thích
+              </Link>
+              <Link
+                href="/faq"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 px-3 py-2.5 text-xs font-semibold text-ink hover:bg-soft-cloud rounded-lg transition-colors"
+              >
+                <span className="w-4 h-4 flex items-center justify-center text-xs font-bold text-mute">?</span>
+                Câu Hỏi Thường Gặp (FAQ)
+              </Link>
+            </div>
           </div>
-
-          {/* Mobile Extra Links */}
-          <div className="pt-3 border-t border-hairline space-y-1">
-            <Link
-              href="/warranty"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-ink hover:bg-soft-cloud rounded-lg transition-colors"
-            >
-              <ShieldCheck className="w-4 h-4 text-amber-600" />
-              Tra Cứu Bảo Hành Điện Tử
-            </Link>
-            <Link
-              href="/account/wishlist"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-ink hover:bg-soft-cloud rounded-lg transition-colors"
-            >
-              <Heart className="w-4 h-4 text-rose-500" />
-              Danh Sách Yêu Thích
-            </Link>
-          </div>
-        </div>
+        </>
       )}
     </header>
   );
