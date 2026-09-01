@@ -3,8 +3,7 @@ import { Card, Form, Input, Button, Alert, Typography, Space, Tag } from 'antd';
 import { UserOutlined, LockOutlined, CrownOutlined, SafetyCertificateFilled, ArrowRightOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import LuxuryLogo from '../components/LuxuryLogo';
-
-
+import { API_BASE } from '../lib/api';
 
 const { Title, Text } = Typography;
 
@@ -19,17 +18,24 @@ export default function LoginPage() {
     setErrorMessage(null);
 
     try {
-      const res = await fetch('/api/v1/auth/login', {
+      const res = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(values),
       });
 
-      const data = await res.json();
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error(`Không thể kết nối đến máy chủ API (${API_BASE}). Vui lòng kiểm tra lại trạng thái Backend.`);
+      }
 
       if (!res.ok) {
         throw new Error(data.error?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản.');
       }
+
 
       const user = data.data?.user;
       const allowedRoles = ['admin', 'manager', 'staff'];
