@@ -166,7 +166,7 @@ export default function Header() {
             href="/products?category=nhan"
             className="transition-colors hover:text-stone uppercase tracking-wider py-1"
           >
-            Nhẫn Kim Cương
+            Nhẫn
           </Link>
           <Link
             href="/products?category=day-chuyen"
@@ -354,7 +354,7 @@ export default function Header() {
               <p className="text-[10px] uppercase font-bold tracking-wider text-mute mb-2 px-2">Danh mục sản phẩm</p>
               {[
                 { href: '/products', label: 'Tất Cả Sản Phẩm' },
-                { href: '/products?category=nhan', label: 'Nhẫn Kim Cương' },
+                { href: '/products?category=nhan', label: 'Nhẫn' },
                 { href: '/products?category=day-chuyen', label: 'Dây Chuyền' },
                 { href: '/products?category=bong-tai', label: 'Bông Tai' },
                 { href: '/products?category=vong-tay', label: 'Vòng Tay' },

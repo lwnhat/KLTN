@@ -40,7 +40,7 @@ export default async function ProductsPage({
         <div className="flex gap-2 flex-wrap text-xs">
           {[
             { label: 'Tất cả', slug: '' },
-            { label: 'Nhẫn Kim Cương', slug: 'nhan' },
+            { label: 'Nhẫn', slug: 'nhan' },
             { label: 'Dây Chuyền', slug: 'day-chuyen' },
             { label: 'Bông Tai', slug: 'bong-tai' },
             { label: 'Vòng Tay', slug: 'vong-tay' },

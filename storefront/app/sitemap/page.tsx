@@ -6,7 +6,7 @@ export default function SitemapPage() {
       title: "Mua Sắm",
       links: [
         { label: "Trang Chủ", href: "/" },
-        { label: "Nhẫn Kim Cương", href: "/products?category=nhan" },
+        { label: "Nhẫn", href: "/products?category=nhan" },
         { label: "Dây Chuyền", href: "/products?category=day-chuyen" },
         { label: "Bông Tai", href: "/products?category=bong-tai" },
         { label: "Vòng Tay", href: "/products?category=vong-tay" },
