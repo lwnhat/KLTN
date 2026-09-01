@@ -72,7 +72,17 @@ router.get('/admin/list', authenticate, authorize('staff'), async (req, res, nex
 
     let query = db('orders');
     if (status) query = query.where({ status });
-    if (search) query = query.where((q) => q.where('order_number', 'ilike', `%${search}%`));
+    if (search) {
+
+      const term = `%${search.trim()}%`;
+      query = query.where((q) => {
+        q.where('order_number', 'ilike', term)
+          .orWhereRaw("customer_snapshot->>'name' ILIKE ?", [term])
+          .orWhereRaw("customer_snapshot->>'phone' ILIKE ?", [term])
+          .orWhereRaw("customer_snapshot->>'email' ILIKE ?", [term]);
+      });
+    }
+
 
     const [orders, countResult] = await Promise.all([
       query.clone().orderBy('created_at', 'desc').limit(limit).offset(offset),
