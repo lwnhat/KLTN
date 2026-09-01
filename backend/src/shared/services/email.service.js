@@ -22,14 +22,20 @@ async function getTransporter() {
 
   if (smtpUser && smtpPass) {
     transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      pool: true,
+      maxConnections: 5,
+      maxMessages: 100,
       auth: {
         user: smtpUser,
         pass: smtpPass,
       },
     });
-    console.log(`📧 [SMTP Ready] Connected to Gmail service for ${smtpUser}`);
+    console.log(`📧 [High-Speed SMTP Pool Ready] Connected to Gmail SSL (port 465) for ${smtpUser}`);
   } else {
+
     try {
       const testAccount = await nodemailer.createTestAccount();
       transporter = nodemailer.createTransport({
@@ -258,11 +264,28 @@ async function sendPaymentSuccessEmail(orderIdOrNumber, overrideEmail = null) {
       }
       const itemPrice = Number(item.price_snapshot || 0);
       const itemQty = Number(item.quantity || 1);
-      const imgUrl = item.image_snapshot || 'https://res.cloudinary.com/akmq0b0f/image/upload/v1788240781/mn-jewelry/products/cwqs6ovoy0e1sxft1tgd.png';
+      // Sanitize imgUrl properly (strip escaped quotes, nulls, fallback to high-res jewelry image)
+
+      let rawImg = item.image_snapshot;
+      let cleanImg = '';
+      if (typeof rawImg === 'string') {
+        try {
+          const parsed = JSON.parse(rawImg);
+          if (typeof parsed === 'string') cleanImg = parsed;
+          else if (parsed && parsed.url) cleanImg = parsed.url;
+        } catch {
+          cleanImg = rawImg;
+        }
+        cleanImg = (cleanImg || '').replace(/^["']|["']$/g, '').trim();
+      }
+      if (!cleanImg || cleanImg === 'null' || cleanImg === 'undefined' || !cleanImg.startsWith('http')) {
+        cleanImg = 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800';
+      }
 
       return `
         <div style="display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid #f1f5f9; align-items: center;">
-          <img src="${imgUrl}" alt="${item.product_name_snapshot}" style="width: 72px; height: 72px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0; flex-shrink: 0;" />
+          <img src="${cleanImg}" alt="${item.product_name_snapshot}" width="72" height="72" style="width: 72px; height: 72px; min-width: 72px; max-width: 72px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; display: block;" />
+
           <div style="flex: 1; min-width: 0;">
             <div style="font-weight: 700; font-size: 13px; color: #0f172a; line-height: 1.4; text-transform: uppercase;">${item.product_name_snapshot}</div>
             <div style="color: #64748b; font-size: 11px; margin-top: 2px;">${item.variant_name_snapshot || 'Tiêu chuẩn'}</div>

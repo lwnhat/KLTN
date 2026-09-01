@@ -241,13 +241,19 @@ async function createOrder(orderData) {
       instance_id: item.instanceId || null,
       sku_snapshot: item.variant.sku,
       product_name_snapshot: item.variant.product_name,
-      variant_name_snapshot: item.variant.variant_name,
-      image_snapshot: JSON.stringify(
-        (typeof item.variant.images === 'string'
-          ? JSON.parse(item.variant.images)
-          : item.variant.images)?.[0]?.url || null
-      ),
+      image_snapshot: (() => {
+        let raw = item.variant.images;
+        if (typeof raw === 'string') {
+          try { raw = JSON.parse(raw); } catch (e) { raw = []; }
+        }
+        const first = Array.isArray(raw) ? raw[0] : raw;
+        if (!first) return 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800';
+        if (typeof first === 'string') return first.replace(/^["']|["']$/g, '');
+        if (first.url) return String(first.url).replace(/^["']|["']$/g, '');
+        return 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800';
+      })(),
       price_snapshot: item.finalPrice,
+
       quantity: item.quantity,
       customization_metadata: item.customizationMetadata
         ? JSON.stringify(item.customizationMetadata)
@@ -359,12 +365,15 @@ async function createOrder(orderData) {
           .delete();
       }
     }
-    // Gửi email xác nhận đơn hàng kèm hóa đơn chi tiết về Gmail
+    // Gửi email xác nhận đơn hàng kèm hóa đơn chi tiết về Gmail (chạy ngầm bất đồng bộ - 0ms delay cho khách hàng)
     if (customerInfo.email) {
-      emailService.sendPaymentSuccessEmail(order.id, customerInfo.email).catch(err =>
-        console.error('[Email] Failed to send order invoice email:', err.message)
-      );
+      setImmediate(() => {
+        emailService.sendPaymentSuccessEmail(order.id, customerInfo.email).catch(err =>
+          console.error('[Email] Failed to send order invoice email:', err.message)
+        );
+      });
     }
+
 
 
     // Gửi thông báo realtime cho user
