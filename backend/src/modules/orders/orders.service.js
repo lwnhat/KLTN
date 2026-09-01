@@ -376,11 +376,6 @@ async function createOrder(orderData) {
           .catch(() => {});
       }
     }
-  } catch (postTxError) {
-    console.warn('[PostTx Cleanup Warning]:', postTxError.message);
-  }
-
-
 
     // Gửi thông báo realtime cho user
     if (userId) {
@@ -394,7 +389,7 @@ async function createOrder(orderData) {
     }
   } catch (postTxError) {
     // Không critical — order đã tạo thành công
-    console.error('Post-transaction cleanup error:', postTxError);
+    console.warn('[PostTx Cleanup Warning]:', postTxError.message);
   }
 
   return { order, isIdempotent: false };
