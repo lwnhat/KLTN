@@ -2,8 +2,12 @@
  * SECURE ADMIN API CLIENT — HttpOnly Cookie & Silent Auto-Refresh Interceptor
  */
 
-const rawUrl = (import.meta.env.VITE_API_URL as string) || 'http://localhost:5000';
+const defaultUrl = typeof window !== 'undefined' && window.location.hostname !== 'localhost'
+  ? 'https://kltn-hx4s.onrender.com'
+  : 'http://localhost:5000';
+const rawUrl = (import.meta.env.VITE_API_URL as string) || defaultUrl;
 export const API_BASE = rawUrl.endsWith('/api/v1') ? rawUrl : `${rawUrl.replace(/\/$/, '')}/api/v1`;
+
 
 
 
