@@ -39,7 +39,8 @@ const authenticate = async (req, res, next) => {
     const user = await db('users')
       .where({ id: decoded.userId, is_active: true })
       .whereNull('deleted_at')
-      .select('id', 'email', 'full_name', 'role', 'is_verified')
+      .select('id', 'email', 'full_name', 'phone', 'role', 'is_verified')
+
       .first();
 
     if (!user) {

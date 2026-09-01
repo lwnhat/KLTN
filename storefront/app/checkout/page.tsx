@@ -62,7 +62,26 @@ export default function CheckoutPage() {
         }));
       } catch {}
     }
+
+    const token = getAccessToken();
+    if (token) {
+      fetch('/api/v1/auth/me', { headers: { Authorization: `Bearer ${token}` } })
+        .then(r => r.json())
+        .then(d => {
+          if (d?.data) {
+            const u = d.data;
+            setCustomerInfo(prev => ({
+              ...prev,
+              name: u.fullName || u.full_name || prev.name,
+              email: u.email || prev.email,
+              phone: u.phone || prev.phone,
+            }));
+          }
+        })
+        .catch(() => {});
+    }
   }, []);
+
 
   const handleApplyVoucher = async () => {
     if (!voucherInput.trim()) return;

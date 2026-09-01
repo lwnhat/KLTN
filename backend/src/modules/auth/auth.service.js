@@ -49,7 +49,8 @@ async function register({ email, password, fullName, phone }) {
 
   const [user] = await db('users')
     .insert({ email, password_hash: passwordHash, full_name: fullName, phone: phone || null })
-    .returning(['id', 'email', 'full_name', 'role', 'is_verified']);
+    .returning(['id', 'email', 'full_name', 'phone', 'role', 'is_verified']);
+
 
   // Lưu OTP (hết hạn sau 10 phút)
   await db('otp_codes').insert({
@@ -112,8 +113,16 @@ async function login({ email, password, deviceInfo }) {
   return {
     accessToken,
     refreshToken,
-    user: { id: user.id, email: user.email, fullName: user.full_name, role: user.role, isVerified: user.is_verified },
+    user: {
+      id: user.id,
+      email: user.email,
+      fullName: user.full_name,
+      phone: user.phone || '',
+      role: user.role,
+      isVerified: user.is_verified,
+    },
   };
+
 }
 
 async function refreshAccessToken(rawRefreshToken, deviceInfo = {}) {

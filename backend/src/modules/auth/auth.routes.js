@@ -129,8 +129,18 @@ router.post('/reset-password', async (req, res, next) => {
 
 // GET /api/v1/auth/me
 router.get('/me', authenticate, (req, res) => {
-  success(res, req.user);
+  success(res, {
+    id: req.user.id,
+    email: req.user.email,
+    fullName: req.user.full_name,
+    full_name: req.user.full_name,
+    phone: req.user.phone || '',
+    role: req.user.role,
+    isVerified: req.user.is_verified,
+    is_verified: req.user.is_verified,
+  });
 });
+
 
 // PUT /api/v1/auth/profile — Cập nhật thông tin cá nhân
 router.put('/profile', authenticate, async (req, res, next) => {

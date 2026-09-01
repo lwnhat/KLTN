@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import { getAccessToken } from '@/lib/api';
 
 import { useEffect, useState } from 'react';
@@ -32,9 +32,33 @@ export default function ProfilePage() {
     }
     const parsed = JSON.parse(userStr);
     setUser(parsed);
-    setFullName(parsed.fullName || '');
+    setFullName(parsed.fullName || parsed.full_name || '');
     setPhone(parsed.phone || '');
+
+    // Đồng bộ thông tin mới nhất trực tiếp từ cơ sở dữ liệu
+    fetch('/api/v1/auth/me', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.data) {
+          const u = data.data;
+          setUser((prev: any) => ({ ...prev, ...u }));
+          if (u.fullName || u.full_name) setFullName(u.fullName || u.full_name);
+          if (u.phone) setPhone(u.phone);
+          localStorage.setItem(
+            'user_info',
+            JSON.stringify({
+              ...parsed,
+              fullName: u.fullName || u.full_name,
+              phone: u.phone || '',
+            })
+          );
+        }
+      })
+      .catch(() => {});
   }, [router]);
+
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
