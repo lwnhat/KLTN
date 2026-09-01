@@ -125,8 +125,8 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
   ];
 
   return (
-    <Layout style={{ minHeight: '100vh', background: '#f8fafc' }}>
-      {/* LUXURY DARK SIDER */}
+    <Layout hasSider style={{ minHeight: '100vh', background: '#f8fafc' }}>
+      {/* LUXURY DARK SIDER - FIXED STICKY ON LEFT */}
       <Sider
         collapsible
         collapsed={collapsed}
@@ -135,7 +135,12 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
         style={{
           background: 'linear-gradient(180deg, #0b0f19 0%, #0f172a 60%, #1e293b 100%)',
           boxShadow: '4px 0 20px rgba(0, 0, 0, 0.15)',
-          zIndex: 10,
+          zIndex: 100,
+          position: 'sticky',
+          top: 0,
+          left: 0,
+          height: '100vh',
+          maxHeight: '100vh',
         }}
       >
         {/* Brand Logo Banner */}
@@ -148,12 +153,11 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
             borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
             marginBottom: 12,
             transition: 'all 0.3s ease',
+            flexShrink: 0,
           }}
         >
           <LuxuryLogo size="md" collapsed={collapsed} />
         </div>
-
-
 
         {/* Sidebar Menu */}
         <Menu
@@ -166,6 +170,8 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
             padding: '0 8px',
             fontSize: 13,
             fontWeight: 500,
+            flex: 1,
+            overflowY: 'auto',
           }}
         />
 
@@ -173,10 +179,10 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
         {!collapsed && (
           <div
             style={{
-              position: 'absolute',
-              bottom: 50,
-              left: 12,
-              right: 12,
+              marginTop: 'auto',
+              marginBottom: 48,
+              marginLeft: 12,
+              marginRight: 12,
               padding: '12px 14px',
               borderRadius: 10,
               background: 'rgba(255, 255, 255, 0.04)',
@@ -184,6 +190,7 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
               display: 'flex',
               alignItems: 'center',
               gap: 10,
+              flexShrink: 0,
             }}
           >
             <Avatar
@@ -205,7 +212,8 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
         )}
       </Sider>
 
-      <Layout style={{ background: '#f8fafc' }}>
+      <Layout style={{ minWidth: 0, background: '#f8fafc', display: 'flex', flexDirection: 'column' }}>
+
         {/* LUXURY TOP HEADER */}
         <Header
           style={{
