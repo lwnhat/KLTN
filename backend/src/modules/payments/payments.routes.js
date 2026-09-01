@@ -6,8 +6,10 @@ const { success } = require('../../shared/utils/apiResponse');
 const ApiError = require('../../shared/utils/ApiError');
 const { getIO } = require('../../config/socket');
 const { notifyOrderStatusChange } = require('../notifications/notifications.service');
+const emailService = require('../../shared/services/email.service');
 
 // POST /api/v1/payments/vietqr/generate — Tạo mã VietQR thanh toán chuẩn EMVCo & QuickLink
+
 router.post('/vietqr/generate', async (req, res, next) => {
   try {
     const { orderNumber, amount, bankCode, accountNo, accountName, template } = req.body;
@@ -120,6 +122,11 @@ router.post('/vietqr/simulate-paid', async (req, res, next) => {
       console.error('[Socket.io] Error emitting payment success:', socketErr.message);
     }
 
+    // Gửi email xác nhận thanh toán thành công (TikTok Shop style) về Gmail của khách hàng
+    emailService.sendPaymentSuccessEmail(updatedOrder.id).catch((err) => {
+      console.error('[Email] Failed to send payment success email:', err.message);
+    });
+
     // Gửi thông báo hệ thống
     notifyOrderStatusChange(updatedOrder, updatedOrder.status).catch(() => {});
 
@@ -129,4 +136,18 @@ router.post('/vietqr/simulate-paid', async (req, res, next) => {
   }
 });
 
+// POST /api/v1/payments/send-payment-email — Gửi thử nghiệm hoặc kích hoạt gửi email thanh toán về Gmail
+router.post('/send-payment-email', async (req, res, next) => {
+  try {
+    const { orderNumber, email } = req.body;
+    if (!orderNumber) throw ApiError.badRequest('MISSING_ORDER', 'Vui lòng cung cấp mã đơn hàng.');
+
+    const info = await emailService.sendPaymentSuccessEmail(orderNumber, email);
+    success(res, { messageId: info?.messageId }, 'Đã gửi email thông tin thanh toán thành công!');
+  } catch (err) {
+    next(err);
+  }
+});
+
 module.exports = router;
+

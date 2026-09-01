@@ -17,7 +17,10 @@ import {
   Zap,
   Building2,
   ExternalLink,
+  Mail,
+  Send,
 } from 'lucide-react';
+
 
 const POPULAR_BANKS = [
   { code: 'TCB', name: 'Techcombank' },
@@ -42,6 +45,9 @@ function SuccessContent() {
   const [qrLoading, setQrLoading] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [simulating, setSimulating] = useState(false);
+  const [customEmail, setCustomEmail] = useState('');
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
 
   const isPaidRef = useRef(false);
   const hasNotifiedRef = useRef(false);
@@ -60,6 +66,9 @@ function SuccessContent() {
         const data = await res.json();
         if (data?.data) {
           setOrder(data.data);
+          if (data.data.customer_snapshot?.email) {
+            setCustomEmail((prev) => prev || data.data.customer_snapshot.email);
+          }
           if (data.data.payment_status === 'paid') {
             isPaidRef.current = true;
             if (pollIntervalRef.current) {
@@ -70,6 +79,7 @@ function SuccessContent() {
         }
       }
     } catch {
+
       // ignore
     }
   };
@@ -193,6 +203,30 @@ function SuccessContent() {
       setSimulating(false);
     }
   };
+
+  const handleSendEmail = async () => {
+    if (!orderNumber) return;
+    setSendingEmail(true);
+    try {
+      const res = await fetch('/api/v1/payments/send-payment-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderNumber, email: customEmail || undefined }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setEmailSent(true);
+        showSuccess('Đã gửi thông tin đơn hàng về Gmail thành công!', 'Gửi Email');
+      } else {
+        showSuccess(data.error?.message || 'Không thể gửi email lúc này.', 'Thông báo');
+      }
+    } catch (err: any) {
+      showSuccess(err.message || 'Lỗi gửi email.', 'Lỗi');
+    } finally {
+      setSendingEmail(false);
+    }
+  };
+
 
   const isPaid = order?.payment_status === 'paid';
 
@@ -408,8 +442,58 @@ function SuccessContent() {
         </div>
       </div>
 
+      {/* Gmail Confirmation Notification Card */}
+      <div className="bg-canvas border border-hairline p-5 rounded-lg text-left space-y-3 shadow-sm">
+
+        <div className="flex items-start gap-3">
+          <div className="w-9 h-9 rounded-full bg-red-50 text-red-600 flex items-center justify-center shrink-0 mt-0.5 border border-red-100">
+            <Mail className="w-5 h-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <p className="text-xs font-bold text-ink uppercase tracking-wider">THÔNG BÁO XÁC NHẬN ĐƠN HÀNG QUA GMAIL</p>
+              <span className="text-[10px] font-semibold text-success bg-success/10 px-2 py-0.5 rounded-full border border-success/20">
+                Tự động gửi khi thanh toán
+              </span>
+            </div>
+            <p className="text-xs text-mute mt-1 leading-relaxed">
+              Biên lai điện tử, danh mục sản phẩm và lộ trình vận chuyển được gửi tự động về hòm thư Gmail của bạn theo chuẩn mẫu giao diện.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-2 mt-3">
+              <input
+                type="email"
+                placeholder="Nhập địa chỉ Gmail để nhận bản sao..."
+                value={customEmail}
+                onChange={(e) => setCustomEmail(e.target.value)}
+                className="text-xs bg-canvas border border-hairline px-3 py-2 rounded flex-1 focus:outline-none focus:border-ink"
+              />
+              <button
+                onClick={handleSendEmail}
+                disabled={sendingEmail}
+                className="btn-secondary text-xs py-2 px-4 shrink-0 font-semibold flex items-center justify-center gap-1.5 hover:border-ink"
+              >
+                {sendingEmail ? (
+                  <>Đang gửi...</>
+                ) : (
+                  <>
+                    <Send className="w-3.5 h-3.5" /> {emailSent ? '✓ Đã gửi thành công' : 'Gửi lại vào Gmail'}
+                  </>
+                )}
+              </button>
+            </div>
+            {emailSent && (
+              <p className="text-[11px] text-success mt-1.5 font-medium flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5" /> Đã gửi email xác nhận thành công! Vui lòng kiểm tra hộp thư đến (hoặc thư mục Spam/Quảng cáo).
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row justify-center gap-3 pt-2">
+
         {orderNumber && (
           <Link href={`/account/orders/${orderNumber}`} className="btn-secondary">
             <Package className="w-4 h-4 mr-2" /> Theo Dõi Đơn Hàng
