@@ -159,48 +159,48 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
           <div
             key={toast.id}
             style={{
-              background: 'linear-gradient(145deg, #111827 0%, #0f172a 100%)',
-              color: '#ffffff',
-              border: '1px solid rgba(212, 175, 55, 0.35)',
-              boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.75), 0 0 15px rgba(212, 175, 55, 0.15)',
-              borderRadius: 14,
+              background: '#ffffff',
+              color: '#111111',
+              border: '1px solid #e5e5e5',
+              boxShadow: '0 20px 45px -10px rgba(0, 0, 0, 0.18), 0 0 1px rgba(0, 0, 0, 0.1)',
+              borderRadius: 12,
             }}
             className="pointer-events-auto p-4 overflow-hidden luxury-toast-enter transition-all duration-300 relative group"
           >
             {/* Header / Type Icon */}
             <div className="flex items-start gap-3">
               {toast.type === 'cart' && (
-                <div className="w-9 h-9 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-400 flex items-center justify-center shrink-0 shadow-inner">
-                  <ShoppingBag className="w-4 h-4 text-amber-400" />
+                <div className="w-9 h-9 rounded-full bg-ink text-canvas flex items-center justify-center shrink-0 shadow-sm">
+                  <ShoppingBag className="w-4 h-4 text-canvas" />
                 </div>
               )}
               {toast.type === 'wishlist' && (
-                <div className="w-9 h-9 rounded-full bg-rose-500/20 border border-rose-400/40 text-rose-400 flex items-center justify-center shrink-0">
-                  <Heart className="w-4 h-4 fill-rose-500 text-rose-400" />
+                <div className="w-9 h-9 rounded-full bg-sale/10 border border-sale/30 text-sale flex items-center justify-center shrink-0">
+                  <Heart className="w-4 h-4 fill-sale text-sale" />
                 </div>
               )}
               {toast.type === 'success' && (
-                <div className="w-9 h-9 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-400 flex items-center justify-center shrink-0">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <div className="w-9 h-9 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-700 flex items-center justify-center shrink-0">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-700" />
                 </div>
               )}
               {toast.type === 'error' && (
-                <div className="w-9 h-9 rounded-full bg-rose-500/20 border border-rose-400/40 text-rose-400 flex items-center justify-center shrink-0">
-                  <AlertCircle className="w-4 h-4 text-rose-400" />
+                <div className="w-9 h-9 rounded-full bg-sale/10 border border-sale/30 text-sale flex items-center justify-center shrink-0">
+                  <AlertCircle className="w-4 h-4 text-sale" />
                 </div>
               )}
               {toast.type === 'info' && (
-                <div className="w-9 h-9 rounded-full bg-blue-500/20 border border-blue-400/40 text-blue-400 flex items-center justify-center shrink-0">
-                  <Info className="w-4 h-4 text-blue-400" />
+                <div className="w-9 h-9 rounded-full bg-soft-cloud border border-hairline text-ink flex items-center justify-center shrink-0">
+                  <Info className="w-4 h-4 text-ink" />
                 </div>
               )}
 
               {/* Main Content */}
               <div className="flex-1 min-w-0 pr-2">
                 <div className="flex items-center gap-1.5">
-                  <h4 className="font-bold text-sm text-white tracking-tight flex items-center gap-1.5">
+                  <h4 className="font-bold text-sm text-ink uppercase tracking-wider flex items-center gap-1.5">
                     {toast.title}
-                    {toast.type === 'cart' && <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />}
+                    {toast.type === 'cart' && <Sparkles className="w-3.5 h-3.5 text-ink animate-pulse" />}
                   </h4>
                 </div>
 
@@ -208,53 +208,53 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                 {toast.type === 'cart' && toast.cartItem ? (
                   <div
                     style={{
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      border: '1px solid rgba(255, 255, 255, 0.08)',
-                      borderRadius: 10,
-                      padding: 8,
+                      background: '#f9fafb',
+                      border: '1px solid #e5e5e5',
+                      borderRadius: 8,
+                      padding: 10,
                     }}
                     className="mt-2.5 flex items-center gap-3"
                   >
                     <img
                       src={toast.cartItem.image || 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=200'}
                       alt={toast.cartItem.productName}
-                      style={{ width: 52, height: 52, borderRadius: 8, objectFit: 'cover' }}
-                      className="shrink-0 bg-neutral-800 border border-white/20"
+                      style={{ width: 52, height: 52, borderRadius: 6, objectFit: 'cover' }}
+                      className="shrink-0 bg-soft-cloud border border-hairline-soft"
                       onError={(e) => {
                         e.currentTarget.src = 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=200';
                       }}
                     />
                     <div className="flex-1 min-w-0 text-xs space-y-0.5">
-                      <p className="font-semibold text-white truncate text-xs">{toast.cartItem.productName}</p>
+                      <p className="font-bold text-ink truncate text-xs">{toast.cartItem.productName}</p>
                       {toast.cartItem.variantName && (
-                        <p className="text-slate-400 truncate text-[11px]">{toast.cartItem.variantName}</p>
+                        <p className="text-mute truncate text-[11px]">{toast.cartItem.variantName}</p>
                       )}
                       {toast.cartItem.customizationText && (
-                        <p className="text-amber-300 text-[10px] truncate font-medium">
+                        <p className="text-charcoal text-[10px] truncate font-medium">
                           ✏️ Khắc: "{toast.cartItem.customizationText}"
                         </p>
                       )}
-                      <p className="font-bold text-amber-400 text-sm leading-tight">
+                      <p className="font-bold text-ink text-sm leading-tight pt-0.5">
                         {toast.cartItem.price.toLocaleString('vi-VN')}₫
                       </p>
                     </div>
                   </div>
                 ) : (
                   toast.message && (
-                    <p className="text-xs text-slate-300 mt-1 leading-relaxed">{toast.message}</p>
+                    <p className="text-xs text-mute mt-1 leading-relaxed">{toast.message}</p>
                   )
                 )}
 
                 {/* Action Button for Cart */}
                 {toast.type === 'cart' && (
-                  <div className="mt-3 flex items-center justify-between gap-2 pt-2 border-t border-white/10">
-                    <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap">
+                  <div className="mt-3 flex items-center justify-between gap-2 pt-2.5 border-t border-hairline-soft">
+                    <span className="text-[11px] text-mute font-medium whitespace-nowrap">
                       ⏱️ Giữ kho 15 phút
                     </span>
                     <Link
                       href="/cart"
                       onClick={() => removeToast(toast.id)}
-                      className="bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 text-xs font-bold px-3.5 py-1.5 rounded-lg inline-flex items-center gap-1.5 transition-all shadow-md active:scale-95 whitespace-nowrap"
+                      className="bg-ink hover:bg-black text-canvas text-xs font-bold uppercase tracking-wider px-3.5 py-2 rounded inline-flex items-center gap-1.5 transition-all shadow-sm active:scale-95 whitespace-nowrap"
                     >
                       Xem Giỏ Hàng <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
@@ -265,7 +265,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               {/* Close Button */}
               <button
                 onClick={() => removeToast(toast.id)}
-                className="text-slate-400 hover:text-white transition-colors p-1 rounded-full hover:bg-white/10 shrink-0"
+                className="text-mute hover:text-ink transition-colors p-1 rounded-full hover:bg-soft-cloud shrink-0"
                 aria-label="Đóng thông báo"
               >
                 <X className="w-4 h-4" />
@@ -273,9 +273,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             </div>
 
             {/* Countdown Progress Bar */}
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10 overflow-hidden">
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-hairline-soft overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-200 origin-left"
+                className="h-full bg-ink origin-left"
                 style={{
                   animation: `progress-bar ${toast.duration || 6000}ms linear forwards`,
                 }}
