@@ -9,11 +9,12 @@ import EngravingModal, { EngravingData } from '@/components/product/EngravingMod
 import SizeGuideModal from '@/components/product/SizeGuideModal';
 import ProductAccordions from '@/components/product/ProductAccordions';
 import CompleteTheLook from '@/components/product/CompleteTheLook';
-import { ShieldCheck, Sparkles, Check, FileText, Heart, Star, User, MessageSquare, ShoppingBag, Package, RefreshCw, Gift, Ruler } from 'lucide-react';
+import { ShieldCheck, Sparkles, Check, FileText, Heart, Star, User, MessageSquare, ShoppingBag, Package, RefreshCw, Gift, Ruler, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function ProductDetailPage({ params }: { params: { slug: string } }) {
   const [product, setProduct] = useState<any>(null);
   const [selectedVariant, setSelectedVariant] = useState<any>(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isEngravingOpen, setIsEngravingOpen] = useState(false);
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState('Bạc');
@@ -297,24 +298,126 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
     ? comparePrice
     : Math.round((variantPrice * (100 + discountPct)) / 100);
 
+  // Collect all product images from variant and product
+  const variantImages = (selectedVariant.images || [])
+    .map((img: any) => (typeof img === 'string' ? img : img.url))
+    .filter(Boolean);
+  const productImages = (product.images || [])
+    .map((img: any) => (typeof img === 'string' ? img : img.url))
+    .filter(Boolean);
+  const rawList = Array.from(new Set([primaryImage, ...variantImages, ...productImages]));
+
+  // Default complementary angles if product has few images (providing luxury gift box & closeups as shown in user screenshot)
+  const defaultAngles = isEarring
+    ? [
+        'https://images.unsplash.com/photo-1630019852942-f89202989a59?w=800',
+        'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800',
+        'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=800',
+      ]
+    : isNecklace
+    ? [
+        'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800',
+        'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800',
+        'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=800',
+      ]
+    : isBracelet
+    ? [
+        'https://images.unsplash.com/photo-1611591475179-6fe5e7e597c1?w=800',
+        'https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=800',
+        'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=800',
+      ]
+    : [
+        'https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=800',
+        'https://images.unsplash.com/photo-1598560917505-59a3ad559071?w=800',
+        'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=800',
+      ];
+
+  const allImages = rawList.length >= 3 ? rawList : Array.from(new Set([...rawList, ...defaultAngles])).slice(0, 4);
+
   return (
     <div className="max-w-[1440px] mx-auto px-4 sm:px-12 py-8 sm:py-12 space-y-16">
       {/* Top Product Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-14 items-start">
-        {/* Left: 1:1 Product Stage */}
-        <div className="relative aspect-square w-full bg-soft-cloud overflow-hidden border border-hairline-soft">
-          <Image
-            src={primaryImage}
-            alt={product.name}
-            fill
-            priority
-            sizes="(max-width: 768px) 100vw, 50vw"
-            className="object-cover object-center"
-          />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        {/* Left: Product Images Gallery (7 cols on lg) */}
+        <div className="lg:col-span-7 flex flex-col md:flex-row gap-4 items-start">
+          {/* Desktop Vertical Thumbnails Gallery (Hidden on Mobile) */}
+          <div className="hidden md:flex flex-col gap-3 w-20 lg:w-24 shrink-0 max-h-[580px] overflow-y-auto pr-1">
+            {allImages.map((imgUrl, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => setActiveImageIndex(idx)}
+                className={`relative aspect-square w-full bg-soft-cloud overflow-hidden rounded-sm transition-all ${
+                  activeImageIndex === idx
+                    ? 'border-2 border-ink shadow-sm'
+                    : 'border border-hairline hover:border-charcoal opacity-70 hover:opacity-100'
+                }`}
+              >
+                <Image
+                  src={imgUrl}
+                  alt={`${product.name} - góc chụp ${idx + 1}`}
+                  fill
+                  sizes="96px"
+                  className="object-cover object-center"
+                />
+              </button>
+            ))}
+          </div>
+
+          {/* Main Product Image Stage (Desktop & Mobile) */}
+          <div className="relative aspect-square w-full flex-1 bg-soft-cloud overflow-hidden border border-hairline-soft rounded-sm group">
+            <Image
+              src={allImages[activeImageIndex] || primaryImage}
+              alt={product.name}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 55vw"
+              className="object-cover object-center transition-all duration-300"
+            />
+
+            {/* Mobile-Only Navigation Buttons & Slide Dots */}
+            {allImages.length > 1 && (
+              <>
+                {/* Prev Button (Mobile) */}
+                <button
+                  type="button"
+                  onClick={() => setActiveImageIndex((prev) => (prev > 0 ? prev - 1 : allImages.length - 1))}
+                  className="md:hidden absolute left-2.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-canvas/90 backdrop-blur-sm border border-hairline shadow-md flex items-center justify-center text-ink z-10 active:scale-90 transition-transform"
+                  aria-label="Ảnh trước"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+
+                {/* Next Button (Mobile) */}
+                <button
+                  type="button"
+                  onClick={() => setActiveImageIndex((prev) => (prev < allImages.length - 1 ? prev + 1 : 0))}
+                  className="md:hidden absolute right-2.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-canvas/90 backdrop-blur-sm border border-hairline shadow-md flex items-center justify-center text-ink z-10 active:scale-90 transition-transform"
+                  aria-label="Ảnh tiếp theo"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+
+                {/* Dots Indicator (Mobile) */}
+                <div className="md:hidden absolute bottom-3 inset-x-0 flex items-center justify-center gap-1.5 z-10 pointer-events-none">
+                  {allImages.map((_, dotIdx) => (
+                    <span
+                      key={dotIdx}
+                      className={`transition-all ${
+                        activeImageIndex === dotIdx
+                          ? 'w-5 h-1.5 rounded-full bg-ink'
+                          : 'w-1.5 h-1.5 rounded-full bg-ink/30'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
-        {/* Right: Product Metadata & Actions (Daniel Wellington Luxury PDP) */}
-        <div className="space-y-5">
+        {/* Right: Product Metadata & Actions (5 cols on lg) */}
+        <div className="lg:col-span-5 space-y-5">
           {/* Header */}
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-ink tracking-tight">{product.name}</h1>
