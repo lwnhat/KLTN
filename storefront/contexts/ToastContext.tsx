@@ -59,9 +59,12 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       const newToast: Toast = { ...toast, id, duration };
 
       setToasts((prev) => {
-        // Giới hạn tối đa 3 toast cùng lúc để tránh che khuất màn hình
+        // Prevent duplicate spam of identical message
+        if (prev.some((t) => t.title === toast.title && t.message === toast.message)) {
+          return prev;
+        }
         const updated = [...prev, newToast];
-        return updated.slice(-3);
+        return updated.slice(-2); // Limit to at most 2 toasts simultaneously
       });
 
       if (duration > 0) {
@@ -72,6 +75,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     },
     [removeToast]
   );
+
 
   const showSuccess = useCallback(
     (message: string, title = 'Thành công') => {

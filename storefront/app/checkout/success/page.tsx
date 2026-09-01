@@ -1,7 +1,7 @@
 "use client";
 import { getAccessToken } from '@/lib/api';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useToast } from '@/contexts/ToastContext';
@@ -29,11 +29,12 @@ const POPULAR_BANKS = [
 ];
 
 function SuccessContent() {
-  const searchParams = useSearchParams();
-  const orderNumber = searchParams.get('order') || '';
-  const method = searchParams.get('method') || 'vietqr';
 
+  const searchParams = useSearchParams();
+  const orderNumber = searchParams.get('order');
+  const method = searchParams.get('method') || 'vietqr';
   const { showSuccess } = useToast();
+
   const [order, setOrder] = useState<any>(null);
   const [qrData, setQrData] = useState<any>(null);
   const [selectedBank, setSelectedBank] = useState('TCB');
@@ -41,6 +42,10 @@ function SuccessContent() {
   const [qrLoading, setQrLoading] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [simulating, setSimulating] = useState(false);
+
+  const isPaidRef = useRef(false);
+  const hasNotifiedRef = useRef(false);
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Fetch Order Data
   const fetchOrder = async () => {
@@ -55,6 +60,13 @@ function SuccessContent() {
         const data = await res.json();
         if (data?.data) {
           setOrder(data.data);
+          if (data.data.payment_status === 'paid') {
+            isPaidRef.current = true;
+            if (pollIntervalRef.current) {
+              clearInterval(pollIntervalRef.current);
+              pollIntervalRef.current = null;
+            }
+          }
         }
       }
     } catch {
@@ -98,22 +110,43 @@ function SuccessContent() {
     fetchOrder().finally(() => setLoading(false));
     generateQR(selectedBank);
 
-    // Auto-polling check payment status every 3 seconds if not paid yet
-    const interval = setInterval(() => {
-      if (order?.payment_status !== 'paid') {
-        fetch(`/api/v1/orders/${orderNumber}`)
-          .then((r) => r.json())
-          .then((d) => {
-            if (d?.data?.payment_status === 'paid') {
-              setOrder(d.data);
-              showSuccess('Tài khoản ngân hàng đã nhận được tiền! Đơn hàng đã được xác nhận.', 'Thanh toán thành công');
-            }
-          })
-          .catch(() => {});
+    // Auto-polling check payment status every 3 seconds until paid
+    pollIntervalRef.current = setInterval(async () => {
+      if (isPaidRef.current) {
+        if (pollIntervalRef.current) {
+          clearInterval(pollIntervalRef.current);
+          pollIntervalRef.current = null;
+        }
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/v1/orders/${orderNumber}`);
+        if (!res.ok) return;
+        const d = await res.json();
+        if (d?.data?.payment_status === 'paid') {
+          isPaidRef.current = true;
+          if (pollIntervalRef.current) {
+            clearInterval(pollIntervalRef.current);
+            pollIntervalRef.current = null;
+          }
+          setOrder(d.data);
+          if (!hasNotifiedRef.current) {
+            hasNotifiedRef.current = true;
+            showSuccess('Tài khoản ngân hàng đã nhận được tiền! Đơn hàng đã được xác nhận.', 'Thanh toán thành công');
+          }
+        }
+      } catch {
+        // ignore
       }
     }, 3000);
 
-    return () => clearInterval(interval);
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+        pollIntervalRef.current = null;
+      }
+    };
   }, [orderNumber]);
 
   const handleBankChange = (bankCode: string) => {
@@ -139,12 +172,20 @@ function SuccessContent() {
       });
       const data = await res.json();
       if (data.success) {
+        isPaidRef.current = true;
+        if (pollIntervalRef.current) {
+          clearInterval(pollIntervalRef.current);
+          pollIntervalRef.current = null;
+        }
         setOrder((prev: any) => ({
           ...prev,
           payment_status: 'paid',
           status: 'confirmed',
         }));
-        showSuccess('Đã kích hoạt thanh toán thành công! Đơn hàng đang được chuyển sang bộ phận chế tác.', 'Thanh toán VietQR');
+        if (!hasNotifiedRef.current) {
+          hasNotifiedRef.current = true;
+          showSuccess('Đã kích hoạt thanh toán thành công! Đơn hàng đang được chuyển sang bộ phận chế tác.', 'Thanh toán thành công');
+        }
       }
     } catch {
       alert('Không thể kích hoạt mô phỏng thanh toán.');

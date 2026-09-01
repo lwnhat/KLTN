@@ -241,14 +241,15 @@ export default function CheckoutPage() {
     <div className="min-h-screen bg-canvas pb-20">
       {/* 15-Minute Countdown Banner */}
       {holdExpiry && countdown && (
-        <div className="bg-ink text-canvas py-2.5 px-6 text-center text-sm font-semibold sticky top-16 z-30 flex items-center justify-center gap-2">
-          <Clock className="w-4 h-4 animate-pulse text-amber-400" />
-          <span>TỒN KHO ĐANG ĐƯỢC REDIS TẠM GIỮ CHO BẠN:</span>
-          <span className="bg-canvas text-ink px-2 py-0.5 rounded font-mono text-base font-bold">
+        <div className="bg-ink text-canvas py-2 px-3 sm:px-6 text-center text-xs sm:text-sm font-semibold sticky top-16 z-30 flex items-center justify-center gap-1.5 sm:gap-2">
+          <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-pulse text-amber-400 shrink-0" />
+          <span className="text-[11px] sm:text-xs">TỒN KHO TẠM GIỮ CHO BẠN:</span>
+          <span className="bg-canvas text-ink px-1.5 py-0.5 rounded font-mono text-xs sm:text-sm font-bold shrink-0">
             {countdown}
           </span>
         </div>
       )}
+
 
       <div className="max-w-[1200px] mx-auto px-6 sm:px-12 pt-8 space-y-8">
         {/* Step Indicator Bar */}
@@ -356,20 +357,21 @@ export default function CheckoutPage() {
                   />
                 </div>
 
-                <div className="flex items-center gap-3 pt-2">
+                <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3">
                   <button
                     type="button"
                     onClick={() => setStep(1)}
-                    className="btn-secondary py-3.5 px-5 text-sm flex items-center gap-1.5"
+                    className="btn-secondary py-3 px-5 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 w-full sm:w-auto shrink-0 order-2 sm:order-1"
                   >
                     <ArrowLeft className="w-4 h-4" /> Quay Lại Giỏ
                   </button>
                   <button
                     type="button"
                     onClick={handleProceedToPayment}
-                    className="btn-primary flex-1 py-3.5 text-sm font-semibold flex items-center justify-center gap-2"
+                    className="btn-primary py-3.5 px-6 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 w-full sm:flex-1 order-1 sm:order-2 text-center"
                   >
-                    Tiếp Tục Chọn Phương Thức Thanh Toán <ArrowRight className="w-4 h-4" />
+                    <span>Tiếp Tục Chọn Phương Thức Thanh Toán</span>
+                    <ArrowRight className="w-4 h-4 shrink-0" />
                   </button>
                 </div>
               </div>
@@ -411,20 +413,21 @@ export default function CheckoutPage() {
                   ))}
                 </div>
 
-                <div className="flex items-center gap-3 pt-2">
+                <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3">
                   <button
                     type="button"
                     onClick={() => setStep(2)}
-                    className="btn-secondary py-3.5 px-5 text-sm flex items-center gap-1.5"
+                    className="btn-secondary py-3 px-5 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 w-full sm:w-auto shrink-0 order-2 sm:order-1"
                   >
                     <ArrowLeft className="w-4 h-4" /> Sửa Địa Chỉ
                   </button>
                   <button
                     type="button"
                     onClick={() => setStep(4)}
-                    className="btn-primary flex-1 py-3.5 text-sm font-semibold flex items-center justify-center gap-2"
+                    className="btn-primary py-3.5 px-6 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 w-full sm:flex-1 order-1 sm:order-2 text-center"
                   >
-                    Xem Lại & Xác Nhận Đơn Hàng <ArrowRight className="w-4 h-4" />
+                    <span>Xem Lại & Xác Nhận Đơn Hàng</span>
+                    <ArrowRight className="w-4 h-4 shrink-0" />
                   </button>
                 </div>
               </div>
@@ -456,12 +459,12 @@ export default function CheckoutPage() {
                   </p>
                 </div>
 
-                <div className="flex items-center gap-3 pt-2">
+                <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3">
                   <button
                     type="button"
                     onClick={() => setStep(3)}
                     disabled={isProcessing}
-                    className="btn-secondary py-3.5 px-5 text-sm flex items-center gap-1.5"
+                    className="btn-secondary py-3 px-5 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 w-full sm:w-auto shrink-0 order-2 sm:order-1"
                   >
                     <ArrowLeft className="w-4 h-4" /> Sửa Thanh Toán
                   </button>
@@ -469,13 +472,14 @@ export default function CheckoutPage() {
                     type="button"
                     onClick={handlePlaceOrder}
                     disabled={isProcessing}
-                    className="btn-primary flex-1 py-4 text-base font-bold tracking-wide"
+                    className="btn-primary py-3.5 px-6 text-sm sm:text-base font-bold tracking-wide flex items-center justify-center w-full sm:flex-1 order-1 sm:order-2 text-center"
                   >
                     {isProcessing ? 'Đang xử lý đơn hàng...' : 'XÁC NHẬN & THANH TOÁN NGAY →'}
                   </button>
                 </div>
               </div>
             )}
+
 
           </div>
 
