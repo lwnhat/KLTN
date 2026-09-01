@@ -359,17 +359,13 @@ async function createOrder(orderData) {
           .delete();
       }
     }
-    // Gửi email xác nhận đơn hàng (bất đồng bộ)
+    // Gửi email xác nhận đơn hàng kèm hóa đơn chi tiết về Gmail
     if (customerInfo.email) {
-      emailService.sendOrderConfirmationEmail({
-        to: customerInfo.email,
-        customerName: customerInfo.name,
-        orderNumber: order.order_number,
-        totalAmount: order.total_amount,
-        items: orderItemsToInsert,
-        shippingAddress,
-      }).catch(err => console.error('[Email] sendOrderConfirmationEmail error:', err.message));
+      emailService.sendPaymentSuccessEmail(order.id, customerInfo.email).catch(err =>
+        console.error('[Email] Failed to send order invoice email:', err.message)
+      );
     }
+
 
     // Gửi thông báo realtime cho user
     if (userId) {

@@ -11,35 +11,25 @@ let transporter = null;
 async function getTransporter() {
   if (transporter) return transporter;
 
-  const hasRealSmtp = process.env.SMTP_HOST &&
-                      process.env.SMTP_USER &&
-                      !process.env.SMTP_USER.includes('your_email') &&
-                      process.env.SMTP_PASS &&
-                      !process.env.SMTP_PASS.includes('your_app_password');
 
-  if (hasRealSmtp) {
-    const isGmail = (process.env.SMTP_HOST || '').includes('gmail');
-    transporter = nodemailer.createTransport(
-      isGmail
-        ? {
-            service: 'gmail',
-            auth: {
-              user: process.env.SMTP_USER?.trim(),
-              pass: process.env.SMTP_PASS ? process.env.SMTP_PASS.replace(/\s+/g, '') : '',
-            },
-          }
-        : {
-            host: process.env.SMTP_HOST,
-            port: parseInt(process.env.SMTP_PORT || '587'),
-            secure: process.env.SMTP_SECURE === 'true' || process.env.SMTP_PORT === '465',
-            auth: {
-              user: process.env.SMTP_USER?.trim(),
-              pass: process.env.SMTP_PASS ? process.env.SMTP_PASS.replace(/\s+/g, '') : '',
-            },
-          }
-    );
+  const smtpUser = (process.env.SMTP_USER && !process.env.SMTP_USER.includes('your_email'))
+    ? process.env.SMTP_USER.trim()
+    : 'lengocminhnhat3@gmail.com';
+
+  const smtpPass = (process.env.SMTP_PASS && !process.env.SMTP_PASS.includes('your_app_password'))
+    ? process.env.SMTP_PASS.replace(/\s+/g, '')
+    : 'abvtfatckrlltwjv';
+
+  if (smtpUser && smtpPass) {
+    transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: smtpUser,
+        pass: smtpPass,
+      },
+    });
+    console.log(`📧 [SMTP Ready] Connected to Gmail service for ${smtpUser}`);
   } else {
-
     try {
       const testAccount = await nodemailer.createTestAccount();
       transporter = nodemailer.createTransport({
@@ -62,10 +52,10 @@ async function getTransporter() {
   return transporter;
 }
 
-const FROM = process.env.EMAIL_FROM || '"Daniel Wellington 💎" <orders@danielwellington.vn>';
-
+const FROM = process.env.EMAIL_FROM || '"Daniel Wellington 💎" <lengocminhnhat3@gmail.com>';
 
 /**
+
  * Gửi email xác thực tài khoản (OTP)
  */
 async function sendVerificationEmail({ to, fullName, otp }) {
