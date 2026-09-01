@@ -298,11 +298,12 @@ async function sendPaymentSuccessEmail(orderIdOrNumber, overrideEmail = null) {
   <div style="max-width: 520px; margin: 20px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06); border: 1px solid #e2e8f0;">
     
     <!-- 1. Header Banner -->
-    <div style="background-color: #000000; padding: 22px 20px; text-align: center;">
-      <h1 style="margin: 0; color: #ffffff; font-size: 18px; letter-spacing: 0.25em; font-weight: 800; text-transform: uppercase;">
-        D A N I E L &nbsp; W E L L I N G T O N
+    <div style="background-color: #000000; padding: 20px 16px; text-align: center;">
+      <h1 style="margin: 0; color: #ffffff; font-size: 14px; letter-spacing: 3px; font-weight: 800; text-transform: uppercase; white-space: nowrap; line-height: 1; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        DANIEL WELLINGTON
       </h1>
     </div>
+
 
     <!-- 2. Sub Navigation Bar -->
     <div style="background-color: #f8fafc; padding: 10px 24px; text-align: center; border-bottom: 1px solid #e2e8f0; font-size: 12px; font-weight: 600;">
