@@ -276,13 +276,32 @@ async function sendPaymentSuccessEmail(orderIdOrNumber, overrideEmail = null) {
       `;
     }).join('');
 
+    const isCod = (order.payment_method || '').toLowerCase() === 'cod';
+    const isPaid = order.payment_status === 'paid';
+
+    const emailSubject = isCod
+      ? `📦 [DANIEL WELLINGTON] Đơn hàng #${orderNumber} đã đặt thành công (COD)!`
+      : (isPaid
+        ? `🎉 [DANIEL WELLINGTON] Đơn hàng #${orderNumber} đã thanh toán thành công!`
+        : `🛍️ [DANIEL WELLINGTON] Đơn hàng #${orderNumber} đã được ghi nhận!`);
+
+    const headlineText = isCod
+      ? 'Đơn hàng đã được xác nhận đặt thành công'
+      : (isPaid ? 'Đơn hàng đã thanh toán thành công' : 'Đơn hàng đã được tiếp nhận');
+
+    const introText = isCod
+      ? 'Cảm ơn bạn đã lựa chọn Daniel Wellington! Đơn hàng của bạn đã được ghi nhận với phương thức <strong>Thanh toán khi nhận hàng (COD)</strong> và đang được chuẩn bị đóng gói xuất kho. Bạn vui lòng chuẩn bị tiền mặt khi nhận hàng.'
+      : (isPaid
+        ? 'Đơn hàng của bạn đã được thanh toán thành công và đang được chuẩn bị đóng gói xuất kho. Bạn có thể theo dõi chi tiết đơn hàng theo liên kết bên dưới.'
+        : 'Đơn hàng của bạn đã được tạo thành công trên hệ thống. Bạn có thể theo dõi chi tiết đơn hàng theo liên kết bên dưới.');
+
     const htmlContent = `
 <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Đơn hàng đã thanh toán thành công — Daniel Wellington</title>
+  <title>${headlineText} — Daniel Wellington</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #0f172a;">
   <div style="max-width: 520px; margin: 20px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06); border: 1px solid #e2e8f0;">
@@ -294,7 +313,6 @@ async function sendPaymentSuccessEmail(orderIdOrNumber, overrideEmail = null) {
       </h1>
     </div>
 
-
     <!-- 2. Sub Navigation Bar -->
     <div style="background-color: #f8fafc; padding: 10px 24px; text-align: center; border-bottom: 1px solid #e2e8f0; font-size: 12px; font-weight: 600;">
       <a href="https://kltn-ashy.vercel.app/account/orders" style="color: #334155; text-decoration: none; padding: 0 14px;">Đơn hàng</a>
@@ -305,14 +323,15 @@ async function sendPaymentSuccessEmail(orderIdOrNumber, overrideEmail = null) {
     <!-- 3. Headline & Greeting -->
     <div style="padding: 28px 24px 16px 24px;">
       <h2 style="margin: 0 0 12px 0; font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1.3;">
-        Đơn hàng đã thanh toán thành công
+        ${headlineText}
       </h2>
       <p style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600; color: #334155;">
         Xin chào ${customerName}!
       </p>
       <p style="margin: 0 0 20px 0; font-size: 13px; color: #64748b; line-height: 1.6;">
-        Đơn hàng của bạn đã được thanh toán thành công và đang được chuẩn bị đóng gói xuất kho. Bạn có thể theo dõi chi tiết đơn hàng theo liên kết bên dưới.
+        ${introText}
       </p>
+
 
       <!-- 4. Big CTA Button -->
       <a href="https://kltn-ashy.vercel.app/checkout/success?order=${orderNumber}" style="display: block; width: 100%; box-sizing: border-box; background-color: #fe2c55; color: #ffffff; text-align: center; padding: 14px 20px; border-radius: 8px; font-weight: 700; font-size: 14px; text-decoration: none; box-shadow: 0 4px 12px rgba(254, 44, 85, 0.25);">
@@ -368,6 +387,10 @@ async function sendPaymentSuccessEmail(orderIdOrNumber, overrideEmail = null) {
           <span style="font-weight: 600;">-${discountAmount.toLocaleString('vi-VN')}₫</span>
         </div>
         ` : ''}
+        <div style="display: flex; justify-content: space-between;">
+          <span>Phương thức:</span>
+          <span style="font-weight: 600; color: #0f172a;">${isCod ? 'Thanh toán khi nhận hàng (COD)' : (order.payment_method ? order.payment_method.toUpperCase() : 'Chuyển khoản VietQR')}</span>
+        </div>
         <div style="display: flex; justify-content: space-between; padding-top: 10px; margin-top: 8px; border-top: 1px dashed #cbd5e1; font-size: 15px;">
           <span style="font-weight: 800; color: #0f172a;">Tổng (${totalQuantity} mặt hàng):</span>
           <span style="font-weight: 800; color: #e11d48; font-size: 16px;">${totalAmount.toLocaleString('vi-VN')}₫</span>
@@ -406,7 +429,7 @@ async function sendPaymentSuccessEmail(orderIdOrNumber, overrideEmail = null) {
     <!-- 9. Footer Legal -->
     <div style="background-color: #f8fafc; padding: 24px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 11px; color: #94a3b8; line-height: 1.6;">
       <p style="margin: 0 0 8px 0;">
-        Tin nhắn này được gửi tự động tới <strong style="color: #475569;">${customerEmail}</strong> để xác nhận giao dịch thanh toán thành công tại Daniel Wellington.
+        Tin nhắn này được gửi tự động tới <strong style="color: #475569;">${customerEmail}</strong> để xác nhận giao dịch đơn hàng tại Daniel Wellington.
       </p>
       <div style="margin: 12px 0;">
         <a href="https://kltn-ashy.vercel.app/terms" style="color: #64748b; text-decoration: underline; margin: 0 6px;">Chính sách bảo mật</a>
@@ -430,9 +453,10 @@ async function sendPaymentSuccessEmail(orderIdOrNumber, overrideEmail = null) {
     const mailOptions = {
       from: FROM,
       to: customerEmail,
-      subject: `🎉 [DANIEL WELLINGTON] Đơn hàng #${orderNumber} đã thanh toán thành công!`,
+      subject: emailSubject,
       html: htmlContent,
     };
+
 
     const info = await t.sendMail(mailOptions);
     console.log(`📧 [Payment Success Email Sent] Order: ${orderNumber} | To: ${customerEmail} | ID: ${info.messageId}`);

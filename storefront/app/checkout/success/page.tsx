@@ -19,7 +19,10 @@ import {
   ExternalLink,
   Mail,
   Send,
+  Truck,
+  CreditCard,
 } from 'lucide-react';
+
 
 
 const POPULAR_BANKS = [
@@ -111,6 +114,8 @@ function SuccessContent() {
     }
   };
 
+  const currentMethod = (order?.payment_method || method || 'vietqr').toLowerCase();
+
   useEffect(() => {
     if (!orderNumber) {
       setLoading(false);
@@ -118,6 +123,13 @@ function SuccessContent() {
     }
 
     fetchOrder().finally(() => setLoading(false));
+  }, [orderNumber]);
+
+  // Chỉ tạo mã VietQR và kích hoạt polling khi phương thức là VietQR và chưa thanh toán
+  useEffect(() => {
+    if (!orderNumber || isPaidRef.current) return;
+    if (currentMethod !== 'vietqr') return;
+
     generateQR(selectedBank);
 
     // Auto-polling check payment status every 3 seconds until paid
@@ -157,7 +169,8 @@ function SuccessContent() {
         pollIntervalRef.current = null;
       }
     };
-  }, [orderNumber]);
+  }, [orderNumber, currentMethod, selectedBank]);
+
 
   const handleBankChange = (bankCode: string) => {
     setSelectedBank(bankCode);
@@ -250,8 +263,55 @@ function SuccessContent() {
         </p>
       </div>
 
-      {/* PAID SUCCESS BANNER */}
-      {isPaid ? (
+      {/* 1. NẾU LÀ COD (Thanh toán khi nhận hàng): HIỂN THỊ THẺ COD RÕ RÀNG KHÔNG HIỆN QR */}
+      {currentMethod === 'cod' && (
+        <div className="bg-canvas border-2 border-emerald-600 rounded-lg p-6 space-y-4 shadow-sm text-left animate-fade-in">
+          <div className="flex items-center justify-between border-b border-hairline-soft pb-3">
+            <div className="flex items-center gap-2.5 font-bold text-ink text-sm uppercase">
+              <Truck className="w-5 h-5 text-emerald-600" />
+              Phương Thức: Thanh Toán Khi Nhận Hàng (COD)
+            </div>
+            <span className="text-xs bg-emerald-500/15 text-emerald-700 font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+              <Check className="w-3.5 h-3.5" />
+              Đã ghi nhận đơn hàng
+            </span>
+          </div>
+
+          <div className="bg-soft-cloud p-4 rounded-lg space-y-2.5 text-xs text-mute leading-relaxed">
+            <div className="flex items-center justify-between">
+              <span className="font-semibold text-ink">Số tiền thanh toán khi nhận hàng:</span>
+              <span className="font-bold text-base text-red-600">
+                {parseInt(order?.total_amount || '0').toLocaleString('vi-VN')}₫
+              </span>
+            </div>
+            <div className="flex items-center justify-between border-t border-hairline-soft pt-2">
+              <span>Hình thức thanh toán:</span>
+              <span className="font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
+                Tiền mặt cho Shipper (COD)
+              </span>
+            </div>
+            <div className="flex items-center justify-between border-t border-hairline-soft pt-2">
+              <span>Phí vận chuyển:</span>
+              <span className="font-semibold text-emerald-600">Miễn phí giao hàng</span>
+            </div>
+          </div>
+
+          <div className="p-3.5 bg-blue-50 border border-blue-100 rounded-lg text-xs text-blue-900 space-y-1">
+            <p className="font-bold flex items-center gap-1.5 text-blue-950">
+              <Sparkles className="w-3.5 h-3.5 text-blue-600" /> Lưu ý nhận hàng:
+            </p>
+            <p>
+              • Nhân viên giao hàng sẽ liên hệ với bạn trước khi giao qua số điện thoại <b>{order?.customer_snapshot?.phone || 'của bạn'}</b>.
+            </p>
+            <p>
+              • Quý khách có quyền <b>đồng kiểm tra hộp đóng gói trang sức chính hãng</b> trước khi thanh toán tiền mặt cho nhân viên giao nhận.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* 2. NẾU KHÔNG PHẢI COD VÀ ĐÃ THANH TOÁN (VIETQR / VNPAY / MOMO) */}
+      {currentMethod !== 'cod' && isPaid && (
         <div className="bg-success/10 border-2 border-success/30 rounded-lg p-6 text-center space-y-3 shadow-sm animate-fade-in">
           <div className="w-12 h-12 bg-success text-canvas rounded-full flex items-center justify-center mx-auto shadow-md">
             <Check className="w-6 h-6 stroke-[3]" />
@@ -260,7 +320,7 @@ function SuccessContent() {
             ĐÃ XÁC NHẬN THANH TOÁN THÀNH CÔNG!
           </h2>
           <p className="text-sm text-mute max-w-md mx-auto">
-            Hệ thống đã nhận được tiền chuyển khoản cho đơn hàng <b>{orderNumber}</b>. Đơn hàng đang được chuẩn bị đóng gói và xuất kho.
+            Hệ thống đã nhận được tiền thanh toán cho đơn hàng <b>{orderNumber}</b>. Đơn hàng đang được chuẩn bị đóng gói và xuất kho.
           </p>
           <div className="pt-2">
             <span className="text-xs bg-success text-canvas font-bold px-3 py-1 rounded-full uppercase">
@@ -268,166 +328,210 @@ function SuccessContent() {
             </span>
           </div>
         </div>
-      ) : (
-        /* VIETQR PAYMENT BOX */
-        qrData && (
-          <div className="bg-canvas border-2 border-ink rounded-lg p-6 space-y-5 shadow-sm text-left animate-fade-in">
-            {/* Box Header */}
-            <div className="flex items-center justify-between border-b border-hairline-soft pb-3">
-              <div className="flex items-center gap-2 font-bold text-ink text-sm uppercase">
-                <QrCode className="w-5 h-5 text-ink" /> Thanh Toán Chuyển Khoản VietQR (Napas 24/7)
-              </div>
-              <span className="text-xs bg-amber-500/15 text-amber-700 font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping inline-block" />
-                Chờ chuyển khoản
-              </span>
+      )}
+
+      {/* 3. NẾU LÀ VIETQR VÀ CHƯA THANH TOÁN */}
+      {currentMethod === 'vietqr' && !isPaid && qrData && (
+        <div className="bg-canvas border-2 border-ink rounded-lg p-6 space-y-5 shadow-sm text-left animate-fade-in">
+          {/* Box Header */}
+          <div className="flex items-center justify-between border-b border-hairline-soft pb-3">
+            <div className="flex items-center gap-2 font-bold text-ink text-sm uppercase">
+              <QrCode className="w-5 h-5 text-ink" /> Thanh Toán Chuyển Khoản VietQR (Napas 24/7)
             </div>
+            <span className="text-xs bg-amber-500/15 text-amber-700 font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping inline-block" />
+              Chờ chuyển khoản
+            </span>
+          </div>
 
-            {/* Bank Selector Chips */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-mute uppercase flex items-center gap-1">
-                <Building2 className="w-3.5 h-3.5" /> Chọn ngân hàng nhận tiền:
-              </label>
-              <div className="flex gap-1.5 flex-wrap">
-                {POPULAR_BANKS.map((b) => (
-                  <button
-                    key={b.code}
-                    onClick={() => handleBankChange(b.code)}
-                    className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
-                      selectedBank === b.code
-                        ? 'bg-ink text-canvas shadow-sm'
-                        : 'bg-soft-cloud text-ink hover:bg-hairline-soft'
-                    }`}
-                  >
-                    {b.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* QR Code Stage & Transfer Details */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center pt-2">
-              {/* QR Image */}
-              <div className="flex flex-col items-center p-4 bg-soft-cloud rounded-lg border border-hairline-soft relative">
-                {qrLoading && (
-                  <div className="absolute inset-0 bg-white/70 backdrop-blur-[1px] flex items-center justify-center rounded-lg z-10">
-                    <div className="w-6 h-6 border-2 border-ink border-t-transparent rounded-full animate-spin" />
-                  </div>
-                )}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={qrData.qrUrl || qrData.qrDataUrl || qrData.quickLinkUrl}
-                  alt="VietQR Payment Code"
-                  className="w-52 h-52 object-contain rounded shadow-sm bg-white"
-                />
-                <span className="text-[11px] text-mute mt-2.5 text-center font-medium">
-                  Mở ứng dụng ngân hàng bất kỳ để quét mã
-                </span>
-              </div>
-
-              {/* Transfer Details Form */}
-              <div className="space-y-3 text-xs text-ink">
-                <div>
-                  <span className="text-mute block text-[11px]">Ngân hàng thụ hưởng:</span>
-                  <span className="font-bold text-sm text-ink">{qrData.bank?.name || 'MB Bank'}</span>
-                </div>
-
-                <div>
-                  <span className="text-mute block text-[11px]">Chủ tài khoản:</span>
-                  <span className="font-bold text-sm text-ink">{qrData.accountName}</span>
-                </div>
-
-                <div>
-                  <span className="text-mute block text-[11px]">Số tài khoản:</span>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="font-mono font-bold text-base text-ink bg-soft-cloud px-2 py-0.5 rounded">
-                      {qrData.accountNo}
-                    </span>
-                    <button
-                      onClick={() => handleCopy(qrData.accountNo, 'accountNo')}
-                      className="btn-secondary text-[11px] px-2 py-1 flex items-center gap-1"
-                      title="Sao chép số tài khoản"
-                    >
-                      {copiedField === 'accountNo' ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-success" /> Đã chép
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5" /> Chép
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <span className="text-mute block text-[11px]">Số tiền chính xác:</span>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="font-bold text-base text-ink text-red-600">
-                      {parseInt(qrData.amount).toLocaleString('vi-VN')}₫
-                    </span>
-                    <button
-                      onClick={() => handleCopy(String(qrData.amount), 'amount')}
-                      className="btn-secondary text-[11px] px-2 py-1 flex items-center gap-1"
-                      title="Sao chép số tiền"
-                    >
-                      {copiedField === 'amount' ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-success" /> Đã chép
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5" /> Chép
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <span className="text-mute block text-[11px]">Nội dung chuyển khoản (Bắt buộc):</span>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="font-mono font-bold bg-soft-cloud px-2 py-1 rounded text-xs text-ink break-all border border-hairline-soft">
-                      {qrData.transferContent}
-                    </span>
-                    <button
-                      onClick={() => handleCopy(qrData.transferContent, 'content')}
-                      className="btn-secondary text-[11px] px-2 py-1 flex items-center gap-1 shrink-0"
-                      title="Sao chép nội dung"
-                    >
-                      {copiedField === 'content' ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-success" /> Đã chép
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5" /> Chép
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Test Simulation Trigger */}
-            <div className="border-t border-hairline-soft pt-3 flex flex-col sm:flex-row items-center justify-between gap-2 bg-amber-500/5 p-3 rounded-md">
-              <span className="text-[11px] text-amber-800 flex items-center gap-1.5">
-                <Zap className="w-3.5 h-3.5 text-amber-600" />
-                Kiểm thử hệ thống: Bạn có thể kích hoạt giả lập ngân hàng gửi thông báo tiền về.
-              </span>
-              <button
-                onClick={handleSimulatePaid}
-                disabled={simulating}
-                className="btn-secondary text-[11px] py-1 px-3 border-amber-500/30 text-amber-900 hover:bg-amber-500/10 shrink-0 font-semibold"
-              >
-                {simulating ? 'Đang xác thực...' : '⚡ Mô phỏng đã thanh toán (Test)'}
-              </button>
+          {/* Bank Selector Chips */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-mute uppercase flex items-center gap-1">
+              <Building2 className="w-3.5 h-3.5" /> Chọn ngân hàng nhận tiền:
+            </label>
+            <div className="flex gap-1.5 flex-wrap">
+              {POPULAR_BANKS.map((b) => (
+                <button
+                  key={b.code}
+                  onClick={() => handleBankChange(b.code)}
+                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                    selectedBank === b.code
+                      ? 'bg-ink text-canvas shadow-sm'
+                      : 'bg-soft-cloud text-ink hover:bg-hairline-soft'
+                  }`}
+                >
+                  {b.name}
+                </button>
+              ))}
             </div>
           </div>
-        )
+
+          {/* QR Code Stage & Transfer Details */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center pt-2">
+            {/* QR Image */}
+            <div className="flex flex-col items-center p-4 bg-soft-cloud rounded-lg border border-hairline-soft relative">
+              {qrLoading && (
+                <div className="absolute inset-0 bg-white/70 backdrop-blur-[1px] flex items-center justify-center rounded-lg z-10">
+                  <div className="w-6 h-6 border-2 border-ink border-t-transparent rounded-full animate-spin" />
+                </div>
+              )}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={qrData.qrUrl || qrData.qrDataUrl || qrData.quickLinkUrl}
+                alt="VietQR Payment Code"
+                className="w-52 h-52 object-contain rounded shadow-sm bg-white"
+              />
+              <span className="text-[11px] text-mute mt-2.5 text-center font-medium">
+                Mở ứng dụng ngân hàng bất kỳ để quét mã
+              </span>
+            </div>
+
+            {/* Transfer Details Form */}
+            <div className="space-y-3 text-xs text-ink">
+              <div>
+                <span className="text-mute block text-[11px]">Ngân hàng thụ hưởng:</span>
+                <span className="font-bold text-sm text-ink">{qrData.bank?.name || 'MB Bank'}</span>
+              </div>
+
+              <div>
+                <span className="text-mute block text-[11px]">Chủ tài khoản:</span>
+                <span className="font-bold text-sm text-ink">{qrData.accountName}</span>
+              </div>
+
+              <div>
+                <span className="text-mute block text-[11px]">Số tài khoản:</span>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="font-mono font-bold text-base text-ink bg-soft-cloud px-2 py-0.5 rounded">
+                    {qrData.accountNo}
+                  </span>
+                  <button
+                    onClick={() => handleCopy(qrData.accountNo, 'accountNo')}
+                    className="btn-secondary text-[11px] px-2 py-1 flex items-center gap-1"
+                    title="Sao chép số tài khoản"
+                  >
+                    {copiedField === 'accountNo' ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-success" /> Đã chép
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" /> Chép
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <span className="text-mute block text-[11px]">Số tiền chính xác:</span>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="font-bold text-base text-ink text-red-600">
+                    {parseInt(qrData.amount).toLocaleString('vi-VN')}₫
+                  </span>
+                  <button
+                    onClick={() => handleCopy(String(qrData.amount), 'amount')}
+                    className="btn-secondary text-[11px] px-2 py-1 flex items-center gap-1"
+                    title="Sao chép số tiền"
+                  >
+                    {copiedField === 'amount' ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-success" /> Đã chép
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" /> Chép
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <span className="text-mute block text-[11px]">Nội dung chuyển khoản (Bắt buộc):</span>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="font-mono font-bold bg-soft-cloud px-2 py-1 rounded text-xs text-ink break-all border border-hairline-soft">
+                    {qrData.transferContent}
+                  </span>
+                  <button
+                    onClick={() => handleCopy(qrData.transferContent, 'content')}
+                    className="btn-secondary text-[11px] px-2 py-1 flex items-center gap-1 shrink-0"
+                    title="Sao chép nội dung"
+                  >
+                    {copiedField === 'content' ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-success" /> Đã chép
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" /> Chép
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Test Simulation Trigger */}
+          <div className="border-t border-hairline-soft pt-3 flex flex-col sm:flex-row items-center justify-between gap-2 bg-amber-500/5 p-3 rounded-md">
+            <span className="text-[11px] text-amber-800 flex items-center gap-1.5">
+              <Zap className="w-3.5 h-3.5 text-amber-600" />
+              Kiểm thử hệ thống: Bạn có thể kích hoạt giả lập ngân hàng gửi thông báo tiền về.
+            </span>
+            <button
+              onClick={handleSimulatePaid}
+              disabled={simulating}
+              className="btn-secondary text-[11px] py-1 px-3 border-amber-500/30 text-amber-900 hover:bg-amber-500/10 shrink-0 font-semibold"
+            >
+              {simulating ? 'Đang xác thực...' : '⚡ Mô phỏng đã thanh toán (Test)'}
+            </button>
+          </div>
+        </div>
       )}
+
+      {/* 4. NẾU LÀ VNPAY HOẶC MOMO VÀ CHƯA THANH TOÁN */}
+      {(currentMethod === 'vnpay' || currentMethod === 'momo') && !isPaid && (
+        <div className="bg-canvas border-2 border-blue-600 rounded-lg p-6 space-y-4 shadow-sm text-left animate-fade-in">
+          <div className="flex items-center justify-between border-b border-hairline-soft pb-3">
+            <div className="flex items-center gap-2.5 font-bold text-ink text-sm uppercase">
+              <CreditCard className="w-5 h-5 text-blue-600" />
+              Cổng Thanh Toán Trực Tuyến: {currentMethod.toUpperCase()}
+            </div>
+            <span className="text-xs bg-amber-500/15 text-amber-700 font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping inline-block" />
+              Chờ hoàn tất giao dịch
+            </span>
+          </div>
+
+          <div className="bg-soft-cloud p-4 rounded-lg space-y-2 text-xs">
+            <div className="flex justify-between">
+              <span>Mã đơn hàng:</span>
+              <span className="font-bold text-ink">{orderNumber}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Số tiền thanh toán:</span>
+              <span className="font-bold text-red-600 text-sm">
+                {parseInt(order?.total_amount || '0').toLocaleString('vi-VN')}₫
+              </span>
+            </div>
+          </div>
+
+          <div className="border-t border-hairline-soft pt-3 flex flex-col sm:flex-row items-center justify-between gap-2 bg-blue-50/50 p-3 rounded-md">
+            <span className="text-[11px] text-blue-800 flex items-center gap-1.5">
+              <Zap className="w-3.5 h-3.5 text-blue-600" />
+              Kiểm thử hệ thống: Kích hoạt giả lập cổng thanh toán {currentMethod.toUpperCase()} hoàn tất.
+            </span>
+            <button
+              onClick={handleSimulatePaid}
+              disabled={simulating}
+              className="btn-secondary text-[11px] py-1.5 px-3 border-blue-600/30 text-blue-900 hover:bg-blue-600/10 shrink-0 font-semibold"
+            >
+              {simulating ? 'Đang xử lý...' : `⚡ Giả lập thanh toán ${currentMethod.toUpperCase()}`}
+            </button>
+          </div>
+        </div>
+      )}
+
 
       {/* Warranty Mobile Badge */}
       <div className="bg-soft-cloud border border-hairline p-5 rounded-lg text-left space-y-2">
