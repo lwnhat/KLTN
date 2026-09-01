@@ -249,14 +249,20 @@ export default function CloudinaryUploader({
                   <span style={{ fontSize: 10, color: '#64748b' }}>Đang upload...</span>
                 </div>
               ) : img.error ? (
-                <div style={{
-                  width: '100%', height: '100%',
-                  display: 'flex', flexDirection: 'column',
-                  alignItems: 'center', justifyContent: 'center', gap: 4,
-                  background: '#fff1f2',
-                }}>
+                <div
+                  onClick={() => handleRemove(idx)}
+                  title="Click để xóa ảnh lỗi này"
+                  style={{
+                    width: '100%', height: '100%',
+                    display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', justifyContent: 'center', gap: 4,
+                    background: '#fff1f2',
+                    cursor: 'pointer',
+                  }}
+                >
                   <WarningOutlined style={{ color: '#ef4444', fontSize: 20 }} />
                   <span style={{ fontSize: 10, color: '#ef4444', padding: '0 4px', textAlign: 'center' }}>Lỗi upload</span>
+                  <span style={{ fontSize: 9, color: '#94a3b8' }}>(Bấm để xóa)</span>
                 </div>
               ) : (
                 <Image
@@ -365,7 +371,40 @@ export default function CloudinaryUploader({
             Thêm URL
           </Button>
         </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8, alignItems: 'center' }}>
+          <span style={{ fontSize: 11, color: '#64748b', fontWeight: 600 }}>Chọn nhanh ảnh mẫu:</span>
+          {[
+            { label: '💍 Nhẫn kim cương', url: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=800' },
+            { label: '✨ Dây chuyền vàng', url: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800' },
+            { label: '🪩 Bông tai ngọc trai', url: 'https://images.unsplash.com/photo-1630019852942-f89202989a59?w=800' },
+            { label: '💫 Vòng tay Tennis', url: 'https://images.unsplash.com/photo-1611591475179-6fe5e7e597c1?w=800' },
+          ].map((sample) => (
+            <button
+              key={sample.label}
+              type="button"
+              onClick={() => {
+                if (images.length < maxImages) {
+                  syncImages([...images, { url: sample.url, isManual: true }]);
+                  message.success(`Đã thêm ${sample.label}`);
+                }
+              }}
+              style={{
+                fontSize: 11,
+                padding: '2px 8px',
+                borderRadius: 4,
+                border: '1px solid #cbd5e1',
+                background: '#ffffff',
+                cursor: 'pointer',
+                color: '#334155',
+                transition: 'all 0.15s',
+              }}
+            >
+              + {sample.label}
+            </button>
+          ))}
+        </div>
       </div>
+
 
       {/* ── Summary ─────────────────────────────────────────────── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
