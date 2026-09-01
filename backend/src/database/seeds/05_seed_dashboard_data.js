@@ -164,8 +164,9 @@ async function seedDashboardData() {
     const variant = variants[cfg.variantIndex % variants.length];
     const product = products.find(p => p.id === variant.product_id) || products[0];
 
-    const orderTime = new Date(now - cfg.dayOffset * ONE_DAY + (Math.random() * 3600 * 4000));
+    const orderTime = new Date(now - cfg.dayOffset * ONE_DAY - Math.floor(Math.random() * 3600 * 1000 * 6) - 120000);
     const orderNumber = `TJ-${orderTime.toISOString().slice(0, 10).replace(/-/g, '')}-${String(orderSequence).padStart(5, '0')}`;
+
 
     const price = parseFloat(variant.price);
     const subtotal = price * cfg.qty;

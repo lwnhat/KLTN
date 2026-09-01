@@ -128,19 +128,26 @@ export default function OrderPipelinePage() {
     },
     {
       title: 'Khách Hàng',
-      render: (_: any, r: any) => {
-        const info = typeof r.customer_snapshot === 'string'
-          ? (() => { try { return JSON.parse(r.customer_snapshot); } catch { return {}; } })()
-          : (r.customer_snapshot || r.customer_info || {});
+      dataIndex: 'customer_snapshot',
+      key: 'customer_snapshot',
+      render: (val: any, record: any) => {
+        const target = val || record?.customer_snapshot || record?.customer_info;
+        const info = typeof target === 'string'
+          ? (() => { try { return JSON.parse(target); } catch { return {}; } })()
+          : (target && typeof target === 'object' ? target : {});
+        const name = info?.name || info?.fullName || record?.customer_name || 'Khách vãng lai';
+        const phone = info?.phone || record?.customer_phone || '—';
+        const email = info?.email || record?.customer_email || '';
         return (
           <div>
-            <div style={{ fontWeight: 600, color: '#0f172a' }}>{info?.name || 'Khách vãng lai'}</div>
-            <div style={{ fontSize: 12, color: '#0284c7' }}>{info?.phone || '—'}</div>
-            {info?.email && <div style={{ fontSize: 11, color: '#64748b' }}>{info.email}</div>}
+            <div style={{ fontWeight: 600, color: '#0f172a' }}>{name}</div>
+            <div style={{ fontSize: 12, color: '#0284c7' }}>{phone}</div>
+            {email && <div style={{ fontSize: 11, color: '#64748b' }}>{email}</div>}
           </div>
         );
       },
     },
+
 
     {
       title: 'Tổng Tiền',

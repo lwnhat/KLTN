@@ -517,15 +517,18 @@ export default function DashboardPage() {
               title: 'Khách Hàng',
               dataIndex: 'customer_snapshot',
               key: 'customer_snapshot',
-              render: (c) => {
-                const info = typeof c === 'string' ? JSON.parse(c || '{}') : c || {};
+              render: (c: any, r: any) => {
+                const info = typeof c === 'string' ? (() => { try { return JSON.parse(c); } catch { return {}; } })() : (c || {});
+                const name = info?.name || info?.fullName || r?.customer_name || 'Khách Vãng Lai';
+                const phone = info?.phone || r?.customer_phone || '—';
                 return (
                   <div>
-                    <div style={{ fontWeight: 600, color: '#0f172a' }}>{info.name || 'Khách Vãng Lai'}</div>
-                    <div style={{ fontSize: 11, color: '#64748b' }}>{info.phone || '—'}</div>
+                    <div style={{ fontWeight: 600, color: '#0f172a' }}>{name}</div>
+                    <div style={{ fontSize: 11, color: '#0284c7' }}>{phone}</div>
                   </div>
                 );
               },
+
             },
             {
               title: 'Tổng Giá Trị',

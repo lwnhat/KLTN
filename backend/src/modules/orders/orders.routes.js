@@ -89,7 +89,23 @@ router.get('/admin/list', authenticate, authorize('staff'), async (req, res, nex
       query.clone().count('id as total').first(),
     ]);
 
-    paginated(res, orders, { page: +page, limit: +limit, total: parseInt(countResult?.total || 0) });
+    const enrichedOrders = orders.map((order) => {
+
+      let cust = order.customer_snapshot;
+      if (typeof cust === 'string') {
+        try { cust = JSON.parse(cust); } catch {}
+      }
+      return {
+        ...order,
+        customer_name: cust?.name || cust?.fullName || 'Khách vãng lai',
+        customer_phone: cust?.phone || '—',
+        customer_email: cust?.email || '',
+        customer_info: cust,
+      };
+    });
+
+    paginated(res, enrichedOrders, { page: +page, limit: +limit, total: parseInt(countResult?.total || 0) });
+
   } catch (err) { next(err); }
 });
 

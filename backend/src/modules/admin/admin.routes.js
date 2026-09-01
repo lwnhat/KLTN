@@ -107,7 +107,19 @@ router.get('/stats', authenticate, authorize('staff'), async (req, res, next) =>
         sold: parseInt(r.sold || 0),
         revenue: parseFloat(r.revenue || 0),
       })),
-      recentOrders: recentOrdersResult,
+      recentOrders: recentOrdersResult.map(o => {
+        let cust = o.customer_snapshot;
+        if (typeof cust === 'string') {
+          try { cust = JSON.parse(cust); } catch {}
+        }
+        return {
+          ...o,
+          customer_name: cust?.name || cust?.fullName || 'Khách vãng lai',
+          customer_phone: cust?.phone || '—',
+          customer_email: cust?.email || '',
+        };
+      }),
+
     });
   } catch (err) { next(err); }
 });
