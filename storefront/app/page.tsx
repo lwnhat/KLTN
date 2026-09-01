@@ -23,10 +23,10 @@ export default async function HomePage() {
   const products = await getFeaturedProducts();
 
   return (
-    <div className="space-y-section pb-16">
+    <div className="space-y-8 sm:space-y-16 pb-16">
       {/* Editorial Campaign Hero */}
-      <section className="relative w-full max-w-[1440px] mx-auto px-6 sm:px-12 pt-4">
-        <div className="relative w-full h-[640px] rounded-none overflow-hidden bg-ink">
+      <section className="relative w-full max-w-[1440px] mx-auto px-4 sm:px-12 pt-2 sm:pt-4">
+        <div className="relative w-full h-[460px] sm:h-[580px] md:h-[640px] rounded-none overflow-hidden bg-ink">
           <Image
             src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1600&auto=format&fit=crop&q=80"
             alt="MN Fine Jewelry Editorial Hero"
@@ -36,15 +36,15 @@ export default async function HomePage() {
           />
 
           {/* Editorial Display Header Burned into Photography */}
-          <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent flex flex-col justify-end p-8 sm:p-16">
-            <h1 className="font-display-campaign text-canvas text-6xl sm:text-8xl md:text-9xl tracking-tight max-w-4xl">
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/30 to-transparent flex flex-col justify-end p-5 sm:p-12 md:p-16 pb-8 sm:pb-14">
+            <h1 className="font-display-campaign text-canvas text-4xl sm:text-7xl md:text-9xl tracking-tight max-w-4xl leading-tight">
               CRAFTED FOR ETERNITY
             </h1>
-            <p className="text-canvas/90 text-lg sm:text-xl font-normal max-w-xl mt-2 mb-8">
+            <p className="text-canvas/90 text-xs sm:text-base md:text-lg font-normal max-w-xl mt-2 mb-5 sm:mb-8">
               Tuyệt tác trang sức kim cương & đá quý cao cấp. Mỗi chế tác mang biểu tượng của sự hoàn mỹ.
             </p>
             <div>
-              <Link href="/products" className="btn-outline-image font-semibold">
+              <Link href="/products" className="btn-outline-image inline-block text-xs sm:text-sm font-semibold py-2.5 px-5 sm:px-6">
                 Khám Phá Bộ Sưu Tập →
               </Link>
             </div>
@@ -53,24 +53,24 @@ export default async function HomePage() {
       </section>
 
       {/* Featured Products Catalog Section */}
-      <section className="max-w-[1440px] mx-auto px-6 sm:px-12">
-        <div className="flex justify-between items-end mb-8">
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-12">
+        <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-2 sm:gap-4 mb-5 sm:mb-8">
           <div>
-            <h2 className="text-2xl sm:text-3xl font-medium tracking-tight text-ink uppercase">
+            <h2 className="text-xl sm:text-3xl font-medium tracking-tight text-ink uppercase">
               BỘ SƯU TẬP NỔI BẬT
             </h2>
-            <p className="text-mute text-sm mt-1">Các chế tác kim cương & vàng được ưa chuộng nhất</p>
+            <p className="text-mute text-xs sm:text-sm mt-0.5">Các chế tác kim cương & vàng được ưa chuộng nhất</p>
           </div>
           {products.length > 0 && (
-            <Link href="/products" className="text-sm font-semibold text-ink hover:underline">
-              Xem Tất Cả ({products.length})
+            <Link href="/products" className="text-xs sm:text-sm font-semibold text-ink hover:underline self-start sm:self-auto">
+              Xem Tất Cả ({products.length}) →
             </Link>
           )}
         </div>
 
-        {/* 3-up Product Grid */}
+        {/* 2-col on mobile, 3-col on desktop */}
         {products.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-10">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 gap-y-6 sm:gap-y-10">
             {products.map((product: any) => (
               <ProductCard
                 key={product.id}
@@ -85,7 +85,6 @@ export default async function HomePage() {
                 allowEngraving={product.allow_engraving}
               />
             ))}
-
           </div>
         ) : (
           <div className="py-16 text-center border border-hairline bg-soft-cloud/50 rounded-lg space-y-3">
@@ -98,14 +97,13 @@ export default async function HomePage() {
         )}
       </section>
 
-
       {/* Category Swatch Grid */}
-      <section className="max-w-[1440px] mx-auto px-6 sm:px-12">
-        <h2 className="text-2xl sm:text-3xl font-medium tracking-tight text-ink uppercase mb-8">
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-12">
+        <h2 className="text-xl sm:text-3xl font-medium tracking-tight text-ink uppercase mb-5 sm:mb-8">
           DANH MỤC TRANG SỨC
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
           {[
             {
               title: 'DÂY CHUYỀN ELAN',
@@ -128,20 +126,19 @@ export default async function HomePage() {
               link: '/products?category=vong-tay',
             },
           ].map((cat, index) => (
-
-            <div key={index} className="relative aspect-[4/5] bg-soft-cloud group overflow-hidden">
+            <div key={index} className="relative aspect-[3/4] sm:aspect-[4/5] bg-soft-cloud group overflow-hidden rounded-sm">
               <Image
                 src={cat.image}
                 alt={cat.title}
                 fill
-                sizes="(max-width: 768px) 100vw, 25vw"
+                sizes="(max-width: 768px) 50vw, 25vw"
                 className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
               />
-              <div className="absolute inset-0 bg-ink/30 p-6 flex flex-col justify-between">
-                <span className="text-canvas text-xs font-semibold uppercase tracking-wider">0{index + 1}</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent p-3 sm:p-6 flex flex-col justify-between">
+                <span className="text-canvas text-[10px] sm:text-xs font-semibold uppercase tracking-wider">0{index + 1}</span>
                 <div>
-                  <h3 className="text-canvas font-semibold text-xl mb-3 leading-snug">{cat.title}</h3>
-                  <Link href={cat.link} className="btn-outline-image text-sm py-2 px-5 font-semibold">
+                  <h3 className="text-canvas font-semibold text-xs sm:text-xl mb-2 sm:mb-3 leading-snug line-clamp-2">{cat.title}</h3>
+                  <Link href={cat.link} className="btn-outline-image text-[11px] sm:text-sm py-1.5 px-3 sm:py-2 sm:px-5 font-semibold inline-block">
                     Xem sản phẩm
                   </Link>
                 </div>
@@ -153,3 +150,4 @@ export default async function HomePage() {
     </div>
   );
 }
+

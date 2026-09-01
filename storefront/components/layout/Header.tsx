@@ -130,17 +130,17 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-40 bg-canvas/95 backdrop-blur-md border-b border-hairline transition-all duration-300">
       {/* Top Banner */}
-      <div className="bg-ink text-canvas text-xs py-2 px-6 tracking-wide flex justify-between items-center select-none">
-        <div className="flex items-center gap-4">
-          <span className="flex items-center gap-1.5 font-medium">
+      <div className="bg-ink text-canvas text-xs py-2 px-4 sm:px-6 tracking-wide flex justify-center md:justify-between items-center select-none text-center">
+        <div className="flex items-center gap-2 sm:gap-4">
+          <span className="flex items-center gap-1.5 font-medium text-[11px] sm:text-xs">
             ✨ Kiểm định GIA & DOJI chính hãng
           </span>
-          <span className="hidden sm:inline-block text-mute">•</span>
-          <span className="hidden sm:inline-flex items-center gap-1.5 font-medium">
-            💎 Miễn phí khắc chữ Laser theo yêu cầu
+          <span className="text-mute/60">•</span>
+          <span className="inline-flex items-center gap-1.5 font-medium text-[11px] sm:text-xs">
+            💎 Khắc chữ Laser miễn phí
           </span>
         </div>
-        <div className="flex items-center gap-4 text-canvas/80">
+        <div className="hidden md:flex items-center gap-4 text-canvas/80">
           <Link href="/warranty" className="hover:text-canvas transition-colors flex items-center gap-1">
             <ShieldCheck className="w-3.5 h-3.5" /> Tra Cứu Bảo Hành
           </Link>
@@ -150,11 +150,12 @@ export default function Header() {
       </div>
 
       {/* Main Navbar */}
-      <div className="max-w-[1440px] mx-auto px-6 sm:px-12 h-20 flex items-center justify-between gap-6">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-12 h-16 sm:h-20 flex items-center justify-between gap-3 sm:gap-6">
         {/* Brand Logo */}
         <Link href="/" className="shrink-0">
           <LuxuryLogo size="md" />
         </Link>
+
 
 
 
