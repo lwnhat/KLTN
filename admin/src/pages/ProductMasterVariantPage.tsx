@@ -19,7 +19,7 @@ export default function ProductMasterVariantPage() {
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState<string | undefined>(undefined);
-  const [pagination, setPagination] = useState({ current: 1, pageSize: 12, total: 0 });
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 50, total: 0 });
   const [categories, setCategories] = useState<any[]>([]);
 
   useEffect(() => {
@@ -53,17 +53,19 @@ export default function ProductMasterVariantPage() {
   // ─────────────────────────────────────────────────────────────────────
   // PRODUCT CRUD
   // ─────────────────────────────────────────────────────────────────────
-  const fetchProducts = async (page = 1) => {
+  const fetchProducts = async (page = 1, pageSize = 50) => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ page: String(page), limit: '12', status: 'all' });
+      const params = new URLSearchParams({ page: String(page), limit: String(pageSize), status: 'all' });
       if (search) params.set('search', search);
       if (filterCategory) params.set('category', filterCategory);
       const res = await adminFetch(`/products?${params}`);
       const data = await res.json();
       if (data.success) {
-        setProducts(data.data.data || data.data || []);
-        setPagination(p => ({ ...p, current: page, total: data.data.pagination?.total || 0 }));
+        const list = Array.isArray(data.data) ? data.data : (data.data?.data || []);
+        const total = data.meta?.total ?? data.data?.pagination?.total ?? list.length;
+        setProducts(list);
+        setPagination({ current: page, pageSize, total });
       }
     } catch {
       message.error('Lỗi khi tải danh sách sản phẩm');
@@ -377,7 +379,9 @@ export default function ProductMasterVariantPage() {
           loading={loading}
           pagination={{
             ...pagination,
-            onChange: (p) => fetchProducts(p),
+            pageSizeOptions: ['10', '20', '50', '100'],
+            showSizeChanger: true,
+            onChange: (p, ps) => fetchProducts(p, ps || pagination.pageSize),
             showTotal: (t) => `Tổng cộng ${t} sản phẩm`,
           }}
           size="middle"

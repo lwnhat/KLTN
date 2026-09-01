@@ -9,7 +9,7 @@ const { cache, clearCachePattern } = require('../../shared/middleware/cache.midd
 // GET /api/v1/products — Danh sách sản phẩm (Cache 60s)
 router.get('/', cache(60), async (req, res, next) => {
   try {
-    const { page = 1, limit = 12, category, search, material, minPrice, maxPrice, isFeatured, sort } = req.query;
+    const { page = 1, limit = 12, category, search, material, minPrice, maxPrice, isFeatured, sort, status } = req.query;
     const { products, total } = await productService.getProducts({
       page: parseInt(page),
       limit: parseInt(limit),
@@ -20,6 +20,7 @@ router.get('/', cache(60), async (req, res, next) => {
       maxPrice,
       isFeatured,
       sort,
+      status,
     });
 
     paginated(res, products, { page, limit, total });
