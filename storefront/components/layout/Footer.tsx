@@ -7,9 +7,9 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           {/* Col 1 */}
           <div className="space-y-4">
-            <h4 className="text-base font-semibold text-ink uppercase tracking-wide">VỀ MN JEWELRY</h4>
+            <h4 className="text-base font-semibold text-ink uppercase tracking-wide">VỀ DANIEL WELLINGTON</h4>
             <p className="text-sm text-mute leading-relaxed">
-              Thương hiệu trang sức cao cấp hàng đầu Việt Nam. Mỗi chế tác là một tác phẩm nghệ thuật độc bản đỉnh cao, gắn liền với giấy kiểm định GIA chuẩn quốc tế.
+              Thương hiệu trang sức & đồng hồ cao cấp Daniel Wellington. Mỗi chế tác mang phong cách tối giản thanh lịch, chất liệu vàng và đá quý tinh tuyển chuẩn quốc tế.
             </p>
           </div>
 
@@ -38,19 +38,20 @@ export default function Footer() {
           <div className="space-y-4">
             <h4 className="text-base font-semibold text-ink uppercase tracking-wide">KIỂM ĐỊNH & THANH TOÁN</h4>
             <p className="text-sm text-mute">
-              Hỗ trợ thanh toán an toàn qua cổng VNPay, MoMo & Thẻ quốc tế. Kiểm định GIA / DOJI chính xác 100%.
+              Hỗ trợ thanh toán an toàn qua cổng VNPay, MoMo & Thẻ quốc tế. Kiểm định chính hãng 100%.
             </p>
             <div className="flex gap-2 pt-2">
               <span className="bg-soft-cloud text-ink text-xs font-semibold px-3 py-1.5 rounded-lg border border-hairline-soft">VNPay</span>
               <span className="bg-soft-cloud text-ink text-xs font-semibold px-3 py-1.5 rounded-lg border border-hairline-soft">MoMo</span>
-              <span className="bg-soft-cloud text-ink text-xs font-semibold px-3 py-1.5 rounded-lg border border-hairline-soft">GIA Certified</span>
+              <span className="bg-soft-cloud text-ink text-xs font-semibold px-3 py-1.5 rounded-lg border border-hairline-soft">Chính Hãng</span>
             </div>
           </div>
         </div>
 
         {/* Legal Fine Print Row */}
         <div className="border-t border-hairline-soft mt-16 pt-8 flex flex-col md:flex-row justify-between items-center text-[11px] text-mute gap-4">
-          <p>© 2026 MN Jewelry Inc. Tất cả quyền được bảo lưu.</p>
+          <p>© 2026 Daniel Wellington Inc. Tất cả quyền được bảo lưu.</p>
+
 
           <div className="flex gap-6">
             <Link href="/terms" className="hover:text-ink">Điều khoản sử dụng</Link>

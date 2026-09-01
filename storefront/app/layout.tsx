@@ -4,9 +4,10 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
-  title: 'MN Jewelry — Trang Sức Kim Cương & Chế Tác Cao Cấp',
-  description: 'Thương hiệu trang sức kim cương chính hãng chuẩn GIA. Thiết kế độc bản, miễn phí khắc chữ laser, giao hàng tận nơi toàn quốc.',
+  title: 'Daniel Wellington — Trang Sức & Đồng Hồ Cao Cấp',
+  description: 'Thương hiệu Daniel Wellington chính hãng. Thiết kế thanh lịch chuẩn phong cách Bắc Âu, miễn phí khắc chữ laser, giao hàng tận nơi toàn quốc.',
 };
+
 
 export const viewport: Viewport = {
   width: 'device-width',

@@ -233,10 +233,10 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
                 Hệ Thống Quản Trị Kim Hoàn Cao Cấp
               </div>
               <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.3 }}>
-                MN Fine Jewelry Back-Office Management Suite
+                Daniel Wellington Back-Office Management Suite
               </div>
-
             </div>
+
 
             <div
               style={{

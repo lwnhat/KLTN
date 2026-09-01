@@ -113,16 +113,18 @@ export default function LoginPage() {
       >
         {/* Brand Header */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 26, textAlign: 'center' }}>
-          <div style={{ marginBottom: 12 }}>
-            <LuxuryLogo size="lg" collapsed={true} />
+          <div style={{ marginBottom: 14, display: 'flex', justifyContent: 'center' }}>
+            <img
+              src="/brand-logo.png"
+              alt="DANIEL WELLINGTON"
+              style={{ height: 26, width: 'auto', objectFit: 'contain' }}
+            />
           </div>
-          <Title level={3} style={{ margin: 0, fontWeight: 800, letterSpacing: '0.08em', color: '#0f172a' }}>
-            MN FINE JEWELRY
-          </Title>
-          <Text style={{ color: '#64748b', fontSize: 12, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', marginTop: 4 }}>
+          <Text style={{ color: '#64748b', fontSize: 12, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
             Back-Office Management Suite
           </Text>
         </div>
+
 
 
 
