@@ -177,12 +177,17 @@ async function createOrder(orderData) {
         }
       }
 
+      // Luôn tính giá chuẩn từ database để ngăn chặn Field Tampering (giả mạo giá từ client)
+      let calculatedPrice = parseFloat(variant.price);
+      if (item.customizationMetadata?.type === 'engraving' && variant.allow_engraving) {
+        calculatedPrice += parseFloat(variant.engraving_fee || 0);
+      }
+
       enrichedItems.push({
         ...item,
         variant,
         instance,
-        // Ưu tiên price_snapshot từ cart (đã tính engraving fee)
-        finalPrice: item.priceSnapshot || parseFloat(variant.price),
+        finalPrice: calculatedPrice,
       });
     }
 

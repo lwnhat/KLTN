@@ -11,6 +11,7 @@ admin/node_modules/
 .env.test.local
 .env.production.local
 backend/.env
+backend/src/scripts/
 
 # Build outputs
 storefront/.next/

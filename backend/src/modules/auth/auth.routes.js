@@ -29,7 +29,9 @@ router.post('/register', async (req, res, next) => {
       console.error('[Email] Failed to send verification email:', err.message);
     });
     
-    console.log(`[Dev Log] OTP for ${email}: ${otp}`);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`[Dev Log] OTP for ${email}: ${otp}`);
+    }
     success(res, { user }, 'Đăng ký thành công. Vui lòng kiểm tra email để xác thực.', 201);
   } catch (err) { next(err); }
 });
@@ -111,7 +113,9 @@ router.post('/forgot-password', async (req, res, next) => {
       emailService.sendPasswordResetEmail({ to: email, otp: result.otp }).catch((err) => {
         console.error('[Email] Failed to send password reset email:', err.message);
       });
-      console.log(`[Dev Log] Reset OTP for ${email}: ${result.otp}`);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`[Dev Log] Reset OTP for ${email}: ${result.otp}`);
+      }
     }
     // Luôn trả về success để không lộ email tồn tại hay không
     success(res, null, 'Nếu email tồn tại, bạn sẽ nhận được hướng dẫn đặt lại mật khẩu.');
