@@ -96,10 +96,21 @@ export default function AiChatWidget() {
 
   const quickPrompts = [
     '💍 Nhẫn cầu hôn < 5 triệu',
+    '📞 Tra đơn hàng theo SĐT',
     '📏 Cách tự đo size ngón tay',
     '✨ Khắc chữ laser mất bao lâu?',
     '🛡️ Chính sách bảo hành 12 tháng',
   ];
+
+  // Xử lý chip gợi ý: chip SĐT thì điền vào input, chip khác thì gửi luôn
+  const handleQuickPrompt = (prompt: string) => {
+    if (prompt.includes('SĐT')) {
+      setInput('Tôi muốn tra cứu đơn hàng theo số điện thoại: ');
+      setTimeout(() => inputRef.current?.focus(), 50);
+    } else {
+      handleSend(prompt);
+    }
+  };
 
   const handleSend = async (textToSend?: string) => {
     const messageText = (textToSend || input).trim();
@@ -410,7 +421,7 @@ export default function AiChatWidget() {
             {quickPrompts.map((prompt, idx) => (
               <button
                 key={idx}
-                onClick={() => handleSend(prompt)}
+                onClick={() => handleQuickPrompt(prompt)}
                 disabled={loading}
                 className="shrink-0 text-[11px] font-medium bg-soft-cloud hover:bg-neutral-200 text-ink px-2.5 py-1 rounded-full border border-hairline transition-all active:scale-95 disabled:opacity-50"
               >
@@ -428,7 +439,7 @@ export default function AiChatWidget() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleInputKeyDown}
-                placeholder="Hỏi về trang sức, size nhẫn, tra mã ORD-..."
+                placeholder="Hỏi về trang sức, tra đơn SĐT hoặc mã ORD-..."
                 disabled={loading}
                 className="flex-1 bg-transparent text-xs sm:text-sm text-ink outline-none placeholder:text-mute"
               />
