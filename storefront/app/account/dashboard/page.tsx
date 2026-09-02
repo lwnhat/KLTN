@@ -98,7 +98,9 @@ export default function AccountDashboard() {
             </div>
           </div>
           <a
-            href="http://localhost:3001"
+            href={process.env.NEXT_PUBLIC_ADMIN_URL || 'https://kltnadmin.vercel.app'}
+            target="_blank"
+            rel="noopener noreferrer"
             className="btn-primary text-xs py-2.5 px-4 shrink-0 flex items-center gap-1.5 shadow-sm"
           >
             Vào Dashboard Admin <ArrowRight className="w-3.5 h-3.5" />
