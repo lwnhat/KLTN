@@ -94,18 +94,23 @@ export default function AiChatWidget() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen]);
 
+  // Chips gợi ý nhanh — luôn hiển thị phía trên ô nhập liệu
   const quickPrompts = [
     '💍 Nhẫn cầu hôn < 5 triệu',
-    '📞 Tra đơn hàng theo SĐT',
-    '📏 Cách tự đo size ngón tay',
+    '📦 Tra đơn hàng theo SĐT',
+    '🛡️ Tra bảo hành theo SĐT',
+    '📏 Cách đo size ngón tay',
     '✨ Khắc chữ laser mất bao lâu?',
-    '🛡️ Chính sách bảo hành 12 tháng',
+    '📍 Địa chỉ showroom',
   ];
 
-  // Xử lý chip gợi ý: chip SĐT thì điền vào input, chip khác thì gửi luôn
+  // Chip thông minh: chip liên quan SĐT thì điền template vào input (không gửi ngay)
   const handleQuickPrompt = (prompt: string) => {
-    if (prompt.includes('SĐT')) {
-      setInput('Tôi muốn tra cứu đơn hàng theo số điện thoại: ');
+    if (prompt.includes('đơn hàng theo SĐT')) {
+      setInput('Tra đơn hàng theo số điện thoại: ');
+      setTimeout(() => inputRef.current?.focus(), 50);
+    } else if (prompt.includes('bảo hành theo SĐT')) {
+      setInput('Tra bảo hành theo số điện thoại: ');
       setTimeout(() => inputRef.current?.focus(), 50);
     } else {
       handleSend(prompt);
