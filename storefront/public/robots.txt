@@ -1,0 +1,9 @@
+# Daniel Wellington Robots.txt
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin
+Disallow: /checkout/
+Disallow: /account/
+
+Sitemap: https://kltn-ashy.vercel.app/sitemap.xml

@@ -17,6 +17,7 @@ export default function Footer() {
           <div className="space-y-4">
             <h4 className="text-base font-semibold text-ink uppercase tracking-wide">HỖ TRỢ KHÁCH HÀNG</h4>
             <ul className="space-y-2.5 text-sm text-mute">
+              <li><Link href="/stores" className="hover:text-ink transition-colors font-semibold text-ink">📍 Hệ thống Showroom & Bản đồ</Link></li>
               <li><Link href="/warranty" className="hover:text-ink transition-colors">Tra cứu hạn bảo hành</Link></li>
               <li><Link href="/guide/size" className="hover:text-ink transition-colors">Hướng dẫn đo cỡ nhẫn</Link></li>
               <li><Link href="/guide/engraving" className="hover:text-ink transition-colors">Dịch vụ khắc chữ laser</Link></li>

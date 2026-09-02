@@ -1,5 +1,13 @@
 import ProductCard from '@/components/product/ProductCard';
 import Link from 'next/link';
+import { Metadata } from 'next';
+import Breadcrumbs from '@/components/common/Breadcrumbs';
+import TrustBanner from '@/components/common/TrustBanner';
+
+export const metadata: Metadata = {
+  title: 'Bộ Sưu Tập Trang Sức & Đồng Hồ Cao Cấp',
+  description: 'Khám phá bộ sưu tập nhẫn, dây chuyền, bông tai, vòng tay Daniel Wellington chính hãng. Thiết kế thanh lịch chuẩn phong cách Bắc Âu.',
+};
 
 // Server-side fetch: dùng INTERNAL_API_URL (Docker internal) hoặc 127.0.0.1 khi dev
 const INTERNAL_API_URL = process.env.INTERNAL_API_URL || 'http://127.0.0.1:5000';
@@ -28,7 +36,26 @@ export default async function ProductsPage({
   const products = await getProducts(searchParams.category, searchParams.sort);
 
   return (
-    <div className="max-w-[1440px] mx-auto px-6 sm:px-12 py-12 space-y-8">
+    <div className="max-w-[1440px] mx-auto px-6 sm:px-12 py-8 sm:py-12 space-y-8">
+      {/* Breadcrumb Navigation */}
+      <Breadcrumbs
+        items={[
+          {
+            label: searchParams.category
+              ? searchParams.category === 'nhan'
+                ? 'Nhẫn'
+                : searchParams.category === 'day-chuyen'
+                ? 'Dây Chuyền'
+                : searchParams.category === 'bong-tai'
+                ? 'Bông Tai'
+                : searchParams.category === 'vong-tay'
+                ? 'Vòng Tay'
+                : searchParams.category
+              : 'Tất cả sản phẩm',
+          },
+        ]}
+      />
+
       {/* Header */}
       <div className="border-b border-hairline pb-4 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
@@ -95,6 +122,11 @@ export default async function ProductsPage({
           </Link>
         </div>
       )}
+
+      {/* Trust & Response Time Promise Banner */}
+      <div className="pt-8">
+        <TrustBanner />
+      </div>
     </div>
   );
 }

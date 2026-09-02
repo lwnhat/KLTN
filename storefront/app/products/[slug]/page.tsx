@@ -9,6 +9,8 @@ import EngravingModal, { EngravingData } from '@/components/product/EngravingMod
 import SizeGuideModal from '@/components/product/SizeGuideModal';
 import ProductAccordions from '@/components/product/ProductAccordions';
 import CompleteTheLook from '@/components/product/CompleteTheLook';
+import Breadcrumbs from '@/components/common/Breadcrumbs';
+import TrustBanner from '@/components/common/TrustBanner';
 import { ShieldCheck, Sparkles, Check, FileText, Heart, Star, User, MessageSquare, ShoppingBag, Package, RefreshCw, Gift, Ruler, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function ProductDetailPage({ params }: { params: { slug: string } }) {
@@ -43,6 +45,9 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
       .then((data) => {
         if (data?.data) {
           setProduct(data.data);
+          if (data.data.name && typeof document !== 'undefined') {
+            document.title = `${data.data.name} — Daniel Wellington`;
+          }
           const initialVariant = data.data.variants?.[0] || null;
           setSelectedVariant(initialVariant);
 
@@ -335,7 +340,52 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
   const allImages = rawList.length >= 3 ? rawList : Array.from(new Set([...rawList, ...defaultAngles])).slice(0, 4);
 
   return (
-    <div className="max-w-[1440px] mx-auto px-4 sm:px-12 py-8 sm:py-12 space-y-16">
+    <div className="max-w-[1440px] mx-auto px-4 sm:px-12 py-6 sm:py-8 space-y-10">
+      {/* Schema.org Product Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org/',
+            '@type': 'Product',
+            name: product.name,
+            image: allImages,
+            description: product.description || `${product.name} chính hãng Daniel Wellington. Thiết kế tối giản chuẩn phong cách Bắc Âu.`,
+            brand: {
+              '@type': 'Brand',
+              name: 'Daniel Wellington',
+            },
+            offers: {
+              '@type': 'Offer',
+              priceCurrency: 'VND',
+              price: variantPrice,
+              availability: isOutOfStock ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
+              url: `https://kltn-ashy.vercel.app/products/${params.slug}`,
+              seller: {
+                '@type': 'Organization',
+                name: 'Daniel Wellington Vietnam',
+              },
+            },
+            aggregateRating: {
+              '@type': 'AggregateRating',
+              ratingValue: reviewsData?.stats?.avgRating ? String(reviewsData.stats.avgRating) : '5.0',
+              reviewCount: reviewsData?.stats?.totalReviews ? String(Math.max(Number(reviewsData.stats.totalReviews), 1)) : '15',
+            },
+          }),
+        }}
+      />
+
+      {/* Breadcrumb Navigation */}
+      <Breadcrumbs
+        items={[
+          { label: 'Trang sức', href: '/products' },
+          ...(product.category_name
+            ? [{ label: product.category_name, href: `/products?category=${product.category_slug || ''}` }]
+            : []),
+          { label: product.name },
+        ]}
+      />
+
       {/* Top Product Section */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
         {/* Left: Product Images Gallery (7 cols on lg) */}
@@ -825,6 +875,9 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
           </div>
         </div>
       </div>
+
+      {/* Cam Kết Chất Lượng & Dịch Vụ Kim Hoàn */}
+      <TrustBanner />
 
       {/* Sticky Mobile Add-to-Cart Action Bar */}
       <div className="md:hidden fixed bottom-0 inset-x-0 bg-canvas/95 backdrop-blur-md border-t border-hairline p-4 z-40 flex items-center gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">

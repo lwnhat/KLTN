@@ -1,14 +1,21 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, ShieldCheck, CheckCircle2, AlertCircle, Clock, Calendar, Sparkles } from 'lucide-react';
 import Link from 'next/link';
+import Breadcrumbs from '@/components/common/Breadcrumbs';
 
 export default function WarrantyPage() {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [warranties, setWarranties] = useState<any[] | null>(null);
   const [searched, setSearched] = useState(false);
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.title = 'Tra Cứu Bảo Hành Điện Tử — Daniel Wellington';
+    }
+  }, []);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +40,9 @@ export default function WarrantyPage() {
   };
 
   return (
-    <div className="max-w-[1000px] mx-auto px-6 sm:px-12 py-16 space-y-10">
+    <div className="max-w-[1000px] mx-auto px-6 sm:px-12 py-10 space-y-10">
+      <Breadcrumbs items={[{ label: 'Tra cứu bảo hành' }]} />
+
       <div className="text-center space-y-3">
         <ShieldCheck className="w-16 h-16 text-ink mx-auto stroke-1" />
         <h1 className="text-3xl sm:text-4xl font-bold uppercase tracking-tight text-ink">

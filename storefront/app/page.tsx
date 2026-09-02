@@ -1,6 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import ProductCard from '@/components/product/ProductCard';
+import TrustBanner from '@/components/common/TrustBanner';
+import ArtisanHeritageSection from '@/components/home/ArtisanHeritageSection';
 
 // Server-side fetch: dùng INTERNAL_API_URL (Docker internal) hoặc 127.0.0.1 khi dev
 const INTERNAL_API_URL = process.env.INTERNAL_API_URL || 'http://127.0.0.1:5000';
@@ -51,6 +53,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Trust & Response Time Promise Banner */}
+      <TrustBanner />
 
       {/* Featured Products Catalog Section */}
       <section className="max-w-[1440px] mx-auto px-4 sm:px-12">
@@ -147,6 +152,9 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* Di Sản Chế Tác & Đội Ngũ Nghệ Nhân Kim Hoàn */}
+      <ArtisanHeritageSection />
     </div>
   );
 }

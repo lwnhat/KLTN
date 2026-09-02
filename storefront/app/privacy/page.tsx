@@ -1,24 +1,46 @@
+import { Metadata } from 'next';
+import Breadcrumbs from '@/components/common/Breadcrumbs';
+
+export const metadata: Metadata = {
+  title: 'Chính Sách Bảo Mật Thông Tin Khách Hàng',
+  description: 'Cam kết bảo mật dữ liệu cá nhân, mã hóa giao dịch thanh toán và quyền riêng tư của khách hàng tại Daniel Wellington.',
+};
+
 export default function PrivacyPage() {
   return (
-    <div className="max-w-3xl mx-auto px-6 sm:px-12 py-16 space-y-8">
-      <h1 className="text-3xl font-bold uppercase tracking-tight text-ink">Chính Sách Bảo Mật</h1>
-      <p className="text-mute text-sm">Cập nhật lần cuối: 14/02/2026</p>
+    <div className="max-w-3xl mx-auto px-6 sm:px-12 py-10 space-y-8">
+      <Breadcrumbs items={[{ label: 'Chính sách bảo mật' }]} />
+
+      <div>
+        <span className="text-xs font-bold tracking-[0.2em] uppercase text-mute">
+          Bảo Vệ Dữ Liệu
+        </span>
+        <h1 className="text-3xl font-bold uppercase tracking-tight text-ink mt-1">
+          CHÍNH SÁCH BẢO MẬT
+        </h1>
+        <p className="text-mute text-xs mt-1">Cập nhật lần cuối: Tháng 09/2026</p>
+      </div>
+
       <div className="space-y-6 text-sm leading-relaxed">
-        <section>
-          <h2 className="font-bold text-ink text-lg mb-2">Thu Thập Thông Tin</h2>
-          <p className="text-mute">Chúng tôi thu thập họ tên, email, số điện thoại và địa chỉ giao hàng nhằm xử lý đơn hàng và cung cấp dịch vụ bảo hành. Chúng tôi không bao giờ bán thông tin cá nhân cho bên thứ ba.</p>
+        <section className="p-5 bg-soft-cloud rounded-lg border border-hairline-soft space-y-2">
+          <h2 className="font-bold text-ink text-base">Thu Thập &amp; Sử Dụng Thông Tin</h2>
+          <p className="text-mute">
+            Chúng tôi thu thập họ tên, email, số điện thoại và địa chỉ giao hàng nhằm phục vụ mục đích xử lý đơn hàng, xuất hóa đơn và kích hoạt bảo hành điện tử. Daniel Wellington cam kết không bao giờ mua bán dữ liệu khách hàng cho bên thứ ba.
+          </p>
         </section>
-        <section>
-          <h2 className="font-bold text-ink text-lg mb-2">Bảo Mật Thanh Toán</h2>
-          <p className="text-mute">Toàn bộ giao dịch thanh toán được xử lý qua cổng VNPay được mã hóa SSL. KLTN Jewelry không lưu trữ thông tin thẻ ngân hàng của khách hàng.</p>
+
+        <section className="p-5 bg-soft-cloud rounded-lg border border-hairline-soft space-y-2">
+          <h2 className="font-bold text-ink text-base">Mã Hóa &amp; An Toàn Thanh Toán</h2>
+          <p className="text-mute">
+            Mọi giao dịch thanh toán trực tuyến qua VietQR, VNPay và MoMo đều được mã hóa bằng giao thức SSL/TLS chuẩn ngân hàng quốc tế. Hệ thống không lưu trữ thông tin số thẻ hay mã PIN bảo mật của khách hàng.
+          </p>
         </section>
-        <section>
-          <h2 className="font-bold text-ink text-lg mb-2">Cookie & Analytics</h2>
-          <p className="text-mute">Chúng tôi sử dụng cookie để ghi nhớ phiên đăng nhập và giỏ hàng của bạn. Analytics được thu thập ẩn danh để cải thiện trải nghiệm mua sắm. Bạn có thể xóa cookie bất kỳ lúc nào từ cài đặt trình duyệt.</p>
-        </section>
-        <section>
-          <h2 className="font-bold text-ink text-lg mb-2">Quyền Của Bạn</h2>
-          <p className="text-mute">Bạn có quyền yêu cầu xem, sửa đổi hoặc xóa dữ liệu cá nhân của mình. Liên hệ privacy@kltn-jewelry.vn để biết thêm chi tiết.</p>
+
+        <section className="p-5 bg-soft-cloud rounded-lg border border-hairline-soft space-y-2">
+          <h2 className="font-bold text-ink text-base">Quyền Riêng Tư Của Bạn</h2>
+          <p className="text-mute">
+            Quý khách có toàn quyền yêu cầu trích xuất, cập nhật hoặc xóa thông tin cá nhân khỏi hệ thống bảo hành bất kỳ lúc nào bằng cách liên hệ với bộ phận Chăm sóc khách hàng Daniel Wellington.
+          </p>
         </section>
       </div>
     </div>

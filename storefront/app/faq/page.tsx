@@ -1,34 +1,55 @@
+import { Metadata } from 'next';
+import Breadcrumbs from '@/components/common/Breadcrumbs';
+
+export const metadata: Metadata = {
+  title: 'Câu Hỏi Thường Gặp (FAQ)',
+  description: 'Giải đáp các thắc mắc thường gặp về kiểm định kim cương GIA, dịch vụ khắc chữ laser, đổi size nhẫn và chính sách bảo hành Daniel Wellington.',
+};
+
 export default function FaqPage() {
   const faqs = [
     {
-      q: "Sản phẩm có giấy kiểm định GIA thật không?",
-      a: "Có. 100% sản phẩm kim cương tại KLTN Jewelry đều đi kèm giấy kiểm định GIA (Gemological Institute of America) hoặc DOJI chính hãng. Bạn có thể kiểm tra số hiệu chứng nhận trực tiếp trên website GIA."
+      q: 'Sản phẩm có giấy chứng nhận kiểm định chính hãng không?',
+      a: 'Có. 100% sản phẩm trang sức và đồng hồ tại Daniel Wellington đều đi kèm thẻ bảo hành điện tử chính hãng và giấy kiểm định quốc tế (GIA / DOJI). Quý khách có thể quét mã QR tra cứu trực tiếp.',
     },
     {
-      q: "Dịch vụ khắc chữ laser mất bao lâu?",
-      a: "Dịch vụ khắc chữ laser thường hoàn thành trong 1-2 ngày làm việc. Sau khi khắc chữ, sản phẩm sẽ được kiểm tra chất lượng và đóng gói cẩn thận trước khi giao hàng."
+      q: 'Dịch vụ khắc chữ laser mất bao lâu?',
+      a: 'Dịch vụ khắc chữ laser thường hoàn thành trong vòng 24 - 48 giờ. Sau khi khắc hoàn tất, chế tác sẽ được kiểm định chất lượng quang học và đóng gói trong hộp quà Daniel Wellington sang trọng.',
     },
     {
-      q: "Sản phẩm đã khắc chữ có đổi trả được không?",
-      a: "Sản phẩm đã khắc chữ cá nhân hóa không hỗ trợ đổi trả, ngoại trừ trường hợp lỗi sản xuất. Vui lòng kiểm tra kỹ thông tin trước khi xác nhận."
+      q: 'Sản phẩm đã khắc chữ có được đổi trả không?',
+      a: 'Sản phẩm đã khắc chữ cá nhân hóa theo yêu cầu không áp dụng đổi trả theo sở thích, ngoại trừ trường hợp có lỗi kỹ thuật từ nhà sản xuất.',
     },
     {
-      q: "Làm sao để tra cứu bảo hành?",
-      a: "Bạn có thể tra cứu bằng Mã phiếu bảo hành (VD: WR-20240214-00001) hoặc Số điện thoại mua hàng tại trang tra cứu bảo hành trên website."
+      q: 'Làm sao để tra cứu phiếu bảo hành điện tử?',
+      a: 'Quý khách có thể tra cứu nhanh bằng Mã phiếu bảo hành (VD: WR-XXXXXXXX-XXXX) hoặc Số điện thoại mua hàng tại trang Tra cứu bảo hành trên website.',
     },
     {
-      q: "KLTN Jewelry hỗ trợ những phương thức thanh toán nào?",
-      a: "Chúng tôi hỗ trợ: VietQR, VNPay (QR & thẻ nội địa), chuyển khoản ngân hàng, và thanh toán khi nhận hàng (COD) với đơn hàng dưới 10 triệu đồng."
+      q: 'Daniel Wellington hỗ trợ những phương thức thanh toán nào?',
+      a: 'Chúng tôi hỗ trợ chuyển khoản tức thì VietQR (mọi ngân hàng), cổng VNPay (ATM / Visa / Master / JCB), ví điện tử MoMo, và thanh toán tiền mặt khi nhận hàng (COD).',
     },
     {
-      q: "Có thể chỉnh size nhẫn sau khi mua không?",
-      a: "Có, KLTN Jewelry hỗ trợ chỉnh size nhẫn miễn phí tối đa 2 lần trong vòng 12 tháng bảo hành. Liên hệ cửa hàng để được hẹn lịch."
-    }
+      q: 'Tôi có thể chỉnh size nhẫn sau khi mua không?',
+      a: 'Có. Daniel Wellington hỗ trợ chỉnh size nhẫn miễn phí 2 lần trong vòng 12 tháng kể từ ngày mua hàng. Quý khách có thể mang đến bất kỳ Showroom nào trong hệ thống.',
+    },
   ];
 
   return (
-    <div className="max-w-3xl mx-auto px-6 sm:px-12 py-16 space-y-8">
-      <h1 className="text-3xl font-bold uppercase tracking-tight text-ink">Câu Hỏi Thường Gặp (FAQ)</h1>
+    <div className="max-w-3xl mx-auto px-6 sm:px-12 py-10 space-y-8">
+      <Breadcrumbs items={[{ label: 'Câu hỏi thường gặp' }]} />
+
+      <div>
+        <span className="text-xs font-bold tracking-[0.2em] uppercase text-mute">
+          Trung Tâm Hỗ Trợ
+        </span>
+        <h1 className="text-3xl font-bold uppercase tracking-tight text-ink mt-1">
+          CÂU HỎI THƯỜNG GẶP (FAQ)
+        </h1>
+        <p className="text-sm text-mute mt-1">
+          Những giải đáp nhanh về chế tác, giao nhận và dịch vụ hậu mãi Daniel Wellington.
+        </p>
+      </div>
+
       <div className="divide-y divide-hairline-soft border-t border-hairline-soft">
         {faqs.map((faq, i) => (
           <details key={i} className="py-5 group">
