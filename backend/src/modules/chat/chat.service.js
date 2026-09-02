@@ -32,12 +32,63 @@ async function getProductCatalogSummary() {
 }
 
 /**
+ * Tự động tra cứu mã Đơn hàng (ORD-...) hoặc Mã bảo hành (WR-...) nếu khách hàng đề cập
+ */
+async function lookupOrderOrWarrantyContext(userMessage) {
+  let contextInfo = '';
+  try {
+    // 1. Kiểm tra mã đơn hàng ORD-...
+    const orderMatch = userMessage.match(/ORD-[\w-]+/i);
+    if (orderMatch) {
+      const orderNumber = orderMatch[0].toUpperCase();
+      const order = await db('orders').whereILike('order_number', `%${orderNumber}%`).first();
+      if (order) {
+        const statusMap = {
+          pending: 'Chờ thanh toán / xác nhận',
+          processing: 'Đang gia công chế tác & chuẩn bị hàng',
+          shipped: 'Đang vận chuyển giao hàng hỏa tốc',
+          delivered: 'Đã giao hàng thành công',
+          cancelled: 'Đã hủy',
+        };
+        contextInfo += `\n[DỮ LIỆU ĐƠN HÀNG THẬT TỪ HỆ THỐNG]:\nĐơn hàng ${order.order_number}:\n- Trạng thái hiện tại: ${
+          statusMap[order.status] || order.status
+        }\n- Tổng giá trị: ${Number(order.total_amount).toLocaleString('vi-VN')}₫\n- Tình trạng thanh toán: ${
+          order.payment_status === 'paid' ? 'Đã thanh toán hoàn tất' : 'Chưa thanh toán'
+        }\n- Hãy báo rõ thông tin trên và đính kèm link xem chi tiết: [Xem chi tiết đơn hàng](/account/orders/${order.order_number})\n`;
+      }
+    }
+
+    // 2. Kiểm tra mã bảo hành WR-...
+    const warrantyMatch = userMessage.match(/WR-[\w-]+/i);
+    if (warrantyMatch) {
+      const warrantyCode = warrantyMatch[0].toUpperCase();
+      const warranty = await db('warranties').whereILike('warranty_code', `%${warrantyCode}%`).first();
+      if (warranty) {
+        contextInfo += `\n[DỮ LIỆU BẢO HÀNH THẬT TỪ HỆ THỐNG]:\nPhiếu bảo hành ${warranty.warranty_code}:\n- Trạng thái: ${
+          warranty.status === 'active' ? 'Đang có hiệu lực' : 'Đã hết hạn'
+        }\n- Hạn bảo hành: ${new Date(warranty.end_date).toLocaleDateString('vi-VN')}\n- Số lần chỉnh size miễn phí còn lại: ${
+          warranty.resizing_count_left ?? 2
+        } lần\n- Đính kèm link: [Tra cứu bảo hành chi tiết](/warranty)\n`;
+      }
+    }
+  } catch (err) {
+    console.error('[ChatService] Error looking up order/warranty:', err.message);
+  }
+  return contextInfo;
+}
+
+/**
  * Xử lý trò chuyện với Google Gemini API
  * @param {string} userMessage - Tin nhắn của khách hàng
  * @param {Array} history - Lịch sử trò chuyện trước đó
  */
 async function generateChatResponse(userMessage, history = []) {
+  if (!GEMINI_API_KEY) {
+    return 'Dạ Daniel Wellington xin chào Quý khách! Hiện tại hệ thống trợ lý AI đang được nâng cấp bảo trì. Quý khách vui lòng liên hệ hotline **093 202 9606** hoặc ghé thăm [Hệ thống Showroom](/stores) để được phục vụ chu đáo nhất ạ!';
+  }
+
   const catalogText = await getProductCatalogSummary();
+  const realTimeDataContext = await lookupOrderOrWarrantyContext(userMessage);
 
   const systemInstruction = `
 Bạn là "Trợ Lý Kim Hoàn AI" (Luxury Concierge) độc quyền của thương hiệu trang sức & đồng hồ cao cấp Daniel Wellington.
@@ -52,15 +103,16 @@ Kiến thức thương hiệu & Nghiệp vụ cốt lõi:
 2. Dịch vụ Khắc chữ Laser độc quyền: Miễn phí 100% theo yêu cầu, 4 font chữ (Script chữ thảo lãng mạn, Classic cổ điển, Modern in hoa thanh thoát, Bold nét đậm), tối đa 30 ký tự, hoàn thiện trong 24-48 giờ.
 3. Chính sách Bảo hành: Bảo hành điện tử 12 tháng theo mã WR-..., miễn phí chỉnh size nhẫn 2 lần, làm sạch siêu âm & đánh bóng làm mới kim hoàn trọn đời.
 4. Giao hàng: Giao hỏa tốc 2H tại nội thành TP.HCM & Hà Nội. Miễn phí vận chuyển toàn quốc cho đơn hàng từ 5.000.000₫. Đồng kiểm và ướm thử khi nhận hàng.
-5. Hệ thống Showroom: Flagship Boutique tại 123 Lê Lợi, Quận 1, TP.HCM và 24 Tràng Tiền, Quận Hoàn Kiếm, Hà Nội (Mở cửa 09:00 - 21:30 hàng ngày).
+5. Hệ thống Showroom: Flagship Boutique tại 123 Lê Lợi, Quận 1, TP.HCM và 24 Tràng Tiền, Quận Hoàn Kiếm, Hà Nội (Mở cửa 09:00 - 21:30 hàng ngày, hotline: 093 202 9606).
 6. Phương thức thanh toán: Chuyển khoản VietQR tự động, cổng VNPay, MoMo, và thanh toán khi nhận hàng (COD).
 
-Quy tắc chèn liên kết điều hướng (Rất quan trọng):
+Quy tắc chèn liên kết điều hướng:
 - Khi nhắc đến sản phẩm, HÃY DÙNG LINK NỘI BỘ dạng: [Tên Sản Phẩm](/products/slug-san-pham) để khách bấm vào xem ngay!
 - Khi khách hỏi hướng dẫn đo size nhẫn: Tóm tắt 5 bước đo bằng giấy và kèm link [Hướng dẫn đo size nhẫn chuẩn](/guide/size).
 - Khi khách hỏi tra cứu bảo hành: Kèm link [Tra cứu bảo hành điện tử](/warranty).
 - Khi khách hỏi địa chỉ cửa hàng: Kèm link [Xem bản đồ Showroom](/stores).
 - Khi khách muốn xem tất cả sản phẩm: Kèm link [Bộ sưu tập trang sức](/products).
+${realTimeDataContext ? `\n${realTimeDataContext}` : ''}
 
 Danh mục các sản phẩm nổi bật hiện có trong kho:
 ${catalogText}
@@ -123,7 +175,7 @@ ${catalogText}
   const data = await response.json();
   const replyText =
     data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-    'Xin lỗi Quý khách, em đang gặp gián đoạn tạm thời. Quý khách vui lòng liên hệ hotline 093 202 9606 để được tư vấn viên hỗ trợ ngay ạ!';
+    'Xin lỗi Quý khách, em đang gặp gián đoạn tạm thời. Quý khách vui lòng liên hệ hotline **093 202 9606** để được tư vấn viên hỗ trợ ngay ạ!';
 
   return replyText;
 }
