@@ -125,16 +125,16 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
   ];
 
   return (
-    <Layout hasSider style={{ minHeight: '100vh', background: '#f8fafc' }}>
-      {/* LUXURY DARK SIDER - FIXED STICKY ON LEFT */}
+    <Layout hasSider style={{ minHeight: '100vh', background: 'var(--soft-cloud)' }}>
+      {/* ── SIDEBAR: Storefront ink-black editorial style ────────────────────── */}
       <Sider
         collapsible
         collapsed={collapsed}
         onCollapse={setCollapsed}
-        width={250}
+        width={252}
         style={{
-          background: 'linear-gradient(180deg, #0b0f19 0%, #0f172a 60%, #1e293b 100%)',
-          boxShadow: '4px 0 20px rgba(0, 0, 0, 0.15)',
+          background: 'linear-gradient(180deg, #111111 0%, #1a1a1a 100%)',
+          boxShadow: '2px 0 12px rgba(0,0,0,0.18)',
           zIndex: 100,
           position: 'sticky',
           top: 0,
@@ -143,23 +143,49 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
           maxHeight: '100vh',
         }}
       >
-        {/* Brand Logo Banner */}
+        {/* Brand Identity Block */}
         <div
           style={{
-            padding: collapsed ? '18px 8px' : '20px 18px',
+            padding: collapsed ? '16px 8px' : '18px 20px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: collapsed ? 'center' : 'flex-start',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-            marginBottom: 12,
-            transition: 'all 0.3s ease',
+            gap: 10,
+            borderBottom: '1px solid rgba(255,255,255,0.07)',
+            marginBottom: 8,
+            transition: 'all 0.25s ease',
             flexShrink: 0,
           }}
         >
-          <LuxuryLogo size="md" collapsed={collapsed} />
+          {/* Diamond icon */}
+          <div style={{
+            width: collapsed ? 34 : 32,
+            height: collapsed ? 34 : 32,
+            borderRadius: collapsed ? '50%' : 8,
+            background: 'linear-gradient(135deg, #d4af37 0%, #b45309 100%)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+            boxShadow: '0 2px 8px rgba(212,175,55,0.35)',
+            fontSize: 15,
+            transition: 'all 0.25s ease',
+          }}>💎</div>
+
+          {!collapsed && (
+            <div style={{ overflow: 'hidden' }}>
+              <div style={{
+                fontFamily: "'Bebas Neue', Futura, sans-serif",
+                fontSize: 15,
+                letterSpacing: '0.12em',
+                color: '#ffffff',
+                lineHeight: 1.1,
+                textTransform: 'uppercase',
+              }}>DANIEL WELLINGTON</div>
+              <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.15em', textTransform: 'uppercase', marginTop: 1 }}>Admin Console</div>
+            </div>
+          )}
         </div>
 
-        {/* Sidebar Menu */}
+        {/* Sidebar Navigation Menu */}
         <Menu
           theme="dark"
           mode="inline"
@@ -167,7 +193,7 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
           items={menuItems as any}
           style={{
             background: 'transparent',
-            padding: '0 8px',
+            padding: '4px 8px',
             fontSize: 13,
             fontWeight: 500,
             flex: 1,
@@ -175,18 +201,17 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
           }}
         />
 
-        {/* User Card in Sidebar Bottom (when not collapsed) */}
+        {/* User Profile Card — bottom of sidebar */}
         {!collapsed && (
           <div
             style={{
+              margin: '12px',
               marginTop: 'auto',
-              marginBottom: 48,
-              marginLeft: 12,
-              marginRight: 12,
-              padding: '12px 14px',
+              marginBottom: 44,
+              padding: '11px 13px',
               borderRadius: 10,
-              background: 'rgba(255, 255, 255, 0.04)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.08)',
               display: 'flex',
               alignItems: 'center',
               gap: 10,
@@ -195,16 +220,18 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
           >
             <Avatar
               icon={<UserOutlined />}
+              size={32}
               style={{
-                background: 'linear-gradient(135deg, #b45309 0%, #d97706 100%)',
-                boxShadow: '0 2px 8px rgba(180, 83, 9, 0.4)',
+                background: 'linear-gradient(135deg, #111111 0%, #39393b 100%)',
+                border: '1.5px solid rgba(212,175,55,0.5)',
+                flexShrink: 0,
               }}
             />
-            <div style={{ overflow: 'hidden' }}>
-              <div style={{ color: '#fff', fontSize: 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ overflow: 'hidden', flex: 1 }}>
+              <div style={{ color: '#fff', fontSize: 12.5, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.3 }}>
                 {user.fullName || 'Admin'}
               </div>
-              <div style={{ color: '#94a3b8', fontSize: 11, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 10.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.3 }}>
                 {user.email}
               </div>
             </div>
@@ -212,149 +239,147 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
         )}
       </Sider>
 
-      <Layout style={{ minWidth: 0, background: '#f8fafc', display: 'flex', flexDirection: 'column' }}>
+      <Layout style={{ minWidth: 0, background: 'var(--soft-cloud)', display: 'flex', flexDirection: 'column' }}>
 
-        {/* LUXURY TOP HEADER */}
+        {/* ── TOPBAR: Storefront canvas/hairline style ────────────────────────── */}
         <Header
           style={{
-            background: '#ffffff',
+            background: 'var(--canvas)',
             padding: '0 24px',
-            minHeight: 64,
-            height: 'auto',
+            height: 58,
             lineHeight: 'normal',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            borderBottom: '1px solid #e2e8f0',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)',
+            borderBottom: '1px solid var(--hairline-soft)',
+            boxShadow: 'none',
             position: 'sticky',
             top: 0,
             zIndex: 9,
-            paddingTop: 10,
-            paddingBottom: 10,
           }}
         >
-          {/* Left Title & Status Indicator */}
+          {/* Left: Page title + live status chip */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <div>
-              <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', lineHeight: 1.3 }}>
-                Hệ Thống Quản Trị Kim Hoàn Cao Cấp
+              <div style={{
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: 700,
+                fontSize: 14,
+                color: 'var(--ink)',
+                lineHeight: 1.3,
+                letterSpacing: '-0.01em',
+              }}>
+                Hệ Thống Quản Trị Kim Hoàn
               </div>
-              <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.3 }}>
-                Daniel Wellington Back-Office Management Suite
+              <div style={{ fontSize: 11, color: 'var(--mute)', lineHeight: 1.3 }}>
+                Daniel Wellington · Back-Office Suite
               </div>
             </div>
 
-
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                padding: '4px 10px',
-                borderRadius: 999,
-                background: '#f0fdf4',
-                border: '1px solid #bbf7d0',
-                fontSize: 11,
-                fontWeight: 600,
-                color: '#15803d',
-                lineHeight: 1.2,
-              }}
-            >
-              <CheckCircleFilled style={{ color: '#16a34a' }} /> Realtime PostgreSQL & Redis
+            {/* Live status pill */}
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              padding: '3px 10px',
+              borderRadius: 999,
+              background: '#f0fdf4',
+              border: '1px solid #bbf7d0',
+              fontSize: 11,
+              fontWeight: 600,
+              color: 'var(--success)',
+            }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)', display: 'inline-block', animation: 'pulse 2s infinite' }} />
+              PostgreSQL · Redis
             </div>
           </div>
 
-          {/* Right Action Bar */}
-          <Space size={14} style={{ display: 'flex', alignItems: 'center' }}>
-            <Tooltip title="Tải lại dữ liệu">
+          {/* Right: actions */}
+          <Space size={10} style={{ display: 'flex', alignItems: 'center' }}>
+            <Tooltip title="Tải lại">
               <Button
                 type="text"
                 icon={<ReloadOutlined />}
                 onClick={() => window.location.reload()}
-                style={{ color: '#64748b' }}
+                style={{ color: 'var(--stone)', height: 34, width: 34, padding: 0 }}
               />
             </Tooltip>
 
-            {/* Quick Storefront Button */}
+            {/* View storefront */}
             <Button
               type="default"
-              icon={<ShopOutlined style={{ color: '#b45309' }} />}
-              href="http://localhost:3000"
+              icon={<ShopOutlined />}
+              href="https://kltn-ashy.vercel.app"
               target="_blank"
               style={{
-                borderColor: '#fed7aa',
-                background: '#fffaf5',
-                color: '#9a3412',
+                borderColor: 'var(--hairline)',
+                background: 'var(--canvas)',
+                color: 'var(--ink)',
                 fontWeight: 600,
                 fontSize: 12,
                 height: 34,
               }}
             >
-              Xem Storefront
+              Xem Storefront ↗
             </Button>
 
-            <Badge count={3} offset={[-2, 2]}>
+            <Badge count={0} offset={[-2, 2]}>
               <Button
                 type="text"
                 shape="circle"
-                icon={<BellOutlined style={{ fontSize: 17, color: '#475569' }} />}
+                icon={<BellOutlined style={{ fontSize: 16, color: 'var(--ash)' }} />}
+                style={{ height: 34, width: 34 }}
               />
             </Badge>
 
-            <div style={{ width: 1, height: 22, background: '#e2e8f0' }} />
+            {/* Divider */}
+            <div style={{ width: 1, height: 20, background: 'var(--hairline-soft)' }} />
 
-            {/* User Profile Badge */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '4px 10px 4px 6px',
-                borderRadius: 24,
-                background: '#f1f5f9',
-                border: '1px solid #e2e8f0',
-              }}
-            >
+            {/* User pill */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 7,
+              padding: '3px 12px 3px 5px',
+              borderRadius: 999,
+              background: 'var(--soft-cloud)',
+              border: '1px solid var(--hairline-soft)',
+            }}>
               <Avatar
-                size={28}
+                size={26}
                 icon={<UserOutlined />}
-                style={{
-                  background: 'linear-gradient(135deg, #0f172a 0%, #334155 100%)',
-                }}
+                style={{ background: 'var(--ink)', flexShrink: 0 }}
               />
               <div style={{ lineHeight: 1.1 }}>
-                <Text strong style={{ fontSize: 12, display: 'block', lineHeight: 1.2 }}>
+                <Text strong style={{ fontSize: 12, display: 'block', lineHeight: 1.2, color: 'var(--ink)' }}>
                   {user.fullName || 'Admin'}
                 </Text>
-                <span
-                  style={{
-                    fontSize: 9,
-                    fontWeight: 700,
-                    color: currentRole.color,
-                    letterSpacing: '0.04em',
-                    lineHeight: 1,
-                  }}
-                >
+                <span style={{
+                  fontSize: 9,
+                  fontWeight: 700,
+                  color: currentRole.color,
+                  letterSpacing: '0.05em',
+                  lineHeight: 1,
+                  textTransform: 'uppercase',
+                }}>
                   {currentRole.label}
                 </span>
               </div>
             </div>
 
-            {/* Logout Popconfirm */}
+            {/* Logout */}
             <Popconfirm
               title="Đăng xuất khỏi hệ thống?"
               description="Bạn sẽ cần đăng nhập lại để tiếp tục quản trị."
               onConfirm={handleLogout}
               okText="Đăng xuất"
               cancelText="Hủy"
-              okButtonProps={{ danger: true }}
+              okButtonProps={{ style: { background: 'var(--ink)', borderColor: 'var(--ink)' } }}
             >
               <Button
                 type="text"
-                danger
                 icon={<LogoutOutlined />}
-                style={{ fontWeight: 600, fontSize: 12 }}
+                style={{ fontWeight: 600, fontSize: 12, color: 'var(--ash)' }}
               >
                 Đăng xuất
               </Button>
@@ -362,7 +387,7 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
           </Space>
         </Header>
 
-        {/* MAIN BODY CONTENT */}
+        {/* ── MAIN CONTENT AREA ──────────────────────────────────────────────── */}
         <Content style={{ margin: '20px 24px', minHeight: 'calc(100vh - 120px)' }}>
           {children}
         </Content>
