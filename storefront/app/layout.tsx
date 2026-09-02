@@ -5,6 +5,7 @@ import Footer from '@/components/layout/Footer';
 import LocalSchema from '@/components/common/LocalSchema';
 import GoogleAnalytics from '@/components/common/GoogleAnalytics';
 import { ToastProvider } from '@/contexts/ToastContext';
+import AiChatWidget from '@/components/chat/AiChatWidget';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://kltn-ashy.vercel.app'),
@@ -94,6 +95,7 @@ export default function RootLayout({
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
+          <AiChatWidget />
         </ToastProvider>
       </body>
     </html>

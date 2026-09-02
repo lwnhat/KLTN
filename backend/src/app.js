@@ -34,6 +34,7 @@ const notificationRoutes = require('./modules/notifications/notifications.routes
 const voucherRoutes = require('./modules/vouchers/vouchers.routes');
 const adminRoutes = require('./modules/admin/admin.routes');
 const uploadRoutes = require('./modules/upload/upload.routes');
+const chatRoutes = require('./modules/chat/chat.routes');
 
 // ─── App Setup ──────────────────────────────────────────────────────────────
 const app = express();
@@ -151,6 +152,7 @@ app.use(`${API_PREFIX}/vouchers`, voucherRoutes);
 app.use(`${API_PREFIX}/admin`, adminRoutes);
 app.use(`${API_PREFIX}/admin/inventory`, inventoryRoutes);
 app.use(`${API_PREFIX}/upload`, uploadRoutes);
+app.use(`${API_PREFIX}/chat`, chatRoutes);
 
 // ─── 404 & Error Handler ─────────────────────────────────────────────────────
 app.use(notFoundHandler);
