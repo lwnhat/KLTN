@@ -37,6 +37,7 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
   const [reviewMsg, setReviewMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const addItem = useCartStore((state) => state.addItem);
+  const cartItems = useCartStore((state) => state.items);
   const { showCartToast, showWishlistToast, showSuccess, showError } = useToast();
 
   useEffect(() => {
@@ -330,7 +331,6 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
     ? (selectedVariant.available_stock !== undefined ? selectedVariant.available_stock : (selectedVariant.stock_quantity ?? 0))
     : 0;
 
-  const cartItems = useCartStore((state) => state.items);
   const currentInCart = cartItems
     .filter((i) => i.variantId === selectedVariant?.id)
     .reduce((sum, i) => sum + i.quantity, 0);
