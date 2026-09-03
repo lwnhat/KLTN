@@ -154,6 +154,11 @@ export default function CheckoutPage() {
   }, [holdExpiry, router]);
 
   const handleProceedToPayment = () => {
+    const invalidStockItem = items.find((i) => i.stock !== undefined && (i.stock <= 0 || i.quantity > i.stock));
+    if (invalidStockItem) {
+      showError(`Sản phẩm "${invalidStockItem.productName}" không đủ số lượng tồn kho (chỉ còn ${invalidStockItem.stock ?? 0} chiếc). Vui lòng cập nhật giỏ hàng.`);
+      return;
+    }
 
     if (!customerInfo.name.trim()) {
       showError('Vui lòng nhập họ và tên người nhận.');
@@ -188,10 +193,15 @@ export default function CheckoutPage() {
 
   // Submit Order to Backend API with Idempotency Key
   const handlePlaceOrder = async () => {
-
     if (items.length === 0) {
       alert('Giỏ hàng trống. Vui lòng chọn sản phẩm trước khi thanh toán.');
       router.push('/products');
+      return;
+    }
+
+    const invalidStockItem = items.find((i) => i.stock !== undefined && (i.stock <= 0 || i.quantity > i.stock));
+    if (invalidStockItem) {
+      showError(`Sản phẩm "${invalidStockItem.productName}" không đủ số lượng tồn kho (chỉ còn ${invalidStockItem.stock ?? 0} chiếc).`);
       return;
     }
 

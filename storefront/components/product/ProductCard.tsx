@@ -20,6 +20,8 @@ interface ProductCardProps {
   allowEngraving?: boolean;
   isFeatured?: boolean;
   variantId?: string;
+  stock?: number;
+  isOutOfStock?: boolean;
 }
 
 export default function ProductCard({
@@ -32,6 +34,8 @@ export default function ProductCard({
   image,
   allowEngraving = false,
   variantId,
+  stock,
+  isOutOfStock: propOutOfStock,
 }: ProductCardProps) {
   const imageUrl = image || 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=800&auto=format&fit=crop&q=80';
   const numPrice = typeof price === 'number' ? price : parseFloat(String(price || 0));
@@ -40,6 +44,7 @@ export default function ProductCard({
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const [isHeartBeating, setIsHeartBeating] = useState(false);
 
+  const isOutOfStock = propOutOfStock ?? (stock !== undefined ? stock <= 0 : false);
 
   const { showWishlistToast, showCartToast, showError } = useToast();
   const addItem = useCartStore((state) => state.addItem);
@@ -80,7 +85,12 @@ export default function ProductCard({
     e.preventDefault();
     e.stopPropagation();
 
-    addItem({
+    if (isOutOfStock) {
+      showError('Sản phẩm này hiện đã hết hàng, không thể thêm vào giỏ.');
+      return;
+    }
+
+    const result = addItem({
       variantId: targetVariantId || 'default-variant',
       productName: name,
       variantName: 'Tiêu chuẩn (18K)',
@@ -91,7 +101,13 @@ export default function ProductCard({
       quantity: 1,
       customizationMetadata: null,
       isCustomized: false,
+      stock: stock,
     });
+
+    if (!result.success) {
+      showError(result.message || 'Không thể mua vượt quá số lượng trong kho.');
+      return;
+    }
 
     showCartToast({
       productName: name,
@@ -111,10 +127,27 @@ export default function ProductCard({
             alt={name}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            className="object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
+            className={`object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out ${
+              isOutOfStock ? 'opacity-60 grayscale-[40%]' : ''
+            }`}
             loading="lazy"
           />
         </Link>
+
+        {/* Out of stock badge */}
+        {isOutOfStock && (
+          <div className="absolute top-3 left-3 bg-neutral-900/90 text-canvas text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider backdrop-blur-sm shadow-sm z-10">
+            Hết hàng
+          </div>
+        )}
+
+        {/* Low stock badge */}
+        {!isOutOfStock && stock !== undefined && stock > 0 && stock <= 3 && (
+          <div className="absolute top-3 left-3 bg-amber-600/90 text-canvas text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider backdrop-blur-sm shadow-sm z-10 flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-canvas animate-ping" />
+            Chỉ còn {stock}
+          </div>
+        )}
 
         {/* Action Pills */}
         <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
@@ -145,19 +178,35 @@ export default function ProductCard({
 
         {/* Quick Add Overlay */}
         <div className="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-ink/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex justify-center">
-          <button
-            onClick={handleQuickAdd}
-            className="btn-primary text-xs py-2 px-4 shadow-lg w-full flex items-center justify-center gap-1.5"
-          >
-            <ShoppingBag className="w-3.5 h-3.5" />
-            Thêm Nhanh
-          </button>
+          {isOutOfStock ? (
+            <Link
+              href={`/products/${slug}`}
+              className="bg-neutral-800 text-canvas text-xs py-2 px-4 shadow-lg w-full flex items-center justify-center gap-1.5 font-bold uppercase tracking-wider"
+            >
+              Xem Chi Tiết
+            </Link>
+          ) : (
+            <button
+              onClick={handleQuickAdd}
+              className="btn-primary text-xs py-2 px-4 shadow-lg w-full flex items-center justify-center gap-1.5"
+            >
+              <ShoppingBag className="w-3.5 h-3.5" />
+              Thêm Nhanh
+            </button>
+          )}
         </div>
       </div>
 
       {/* Product Details */}
       <div className="pt-4 pb-2 space-y-1.5 flex flex-col">
-        <p className="text-[11px] text-mute uppercase tracking-widest">{categoryName}</p>
+        <div className="flex items-center justify-between text-[11px] text-mute uppercase tracking-widest">
+          <span>{categoryName}</span>
+          {stock !== undefined && (
+            <span className={`font-semibold ${isOutOfStock ? 'text-stone' : stock <= 3 ? 'text-amber-700' : 'text-mute'}`}>
+              {isOutOfStock ? 'Hết hàng' : `Kho: ${stock}`}
+            </span>
+          )}
+        </div>
         <Link href={`/products/${slug}`} className="block group-hover:underline">
           <h3 className="text-sm font-medium text-ink line-clamp-1 leading-snug">{name}</h3>
         </Link>

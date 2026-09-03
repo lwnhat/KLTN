@@ -102,6 +102,8 @@ export default async function ProductsPage({
               comparePrice={product.compare_price}
               image={product.primary_image}
               allowEngraving={product.allow_engraving}
+              stock={product.total_stock !== undefined ? product.total_stock : product.primary_stock}
+              isOutOfStock={product.is_out_of_stock}
             />
           ))}
         </div>

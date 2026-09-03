@@ -99,6 +99,14 @@ async function getProducts({ page = 1, limit = 12, categorySlug, search, materia
       ? parseFloat(primaryVariant.compare_price)
       : null;
 
+    const totalStock = pVariants.reduce(
+      (sum, v) => sum + Math.max(0, (v.stock_quantity || 0) - (v.reserved_quantity || 0)),
+      0
+    );
+    const primaryStock = primaryVariant
+      ? Math.max(0, (primaryVariant.stock_quantity || 0) - (primaryVariant.reserved_quantity || 0))
+      : 0;
+
     return {
       ...product,
       base_price: parseFloat(product.base_price),
@@ -109,6 +117,9 @@ async function getProducts({ page = 1, limit = 12, categorySlug, search, materia
       primary_image: images[0]?.url || null,
       images,
       allow_engraving: pVariants.some((v) => v.allow_engraving),
+      total_stock: totalStock,
+      primary_stock: primaryStock,
+      is_out_of_stock: totalStock <= 0,
     };
   });
 
